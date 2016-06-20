@@ -40,22 +40,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Toolbar setup
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
+        //ViewPager setup
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        //Tabs setup
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        for (int i=0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(R.drawable.ic_grade_white_48dp);
-        }
+        tabLayout.getTabAt(0).setIcon(R.drawable.home);
+        tabLayout.getTabAt(1).setIcon(R.drawable.heart);
+        tabLayout.getTabAt(2).setIcon(R.drawable.refrigerator_512);
 
         /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //Setup user button
         MenuItem userButton = menu.findItem(R.id.action_user);
         userButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -106,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Pops up the menu when user clicks the portrait.
+     * @param v View of the portrait.
+     */
     public void userPopup(View v) {
         PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_user));
         popup.inflate(R.menu.menu_user);
@@ -191,16 +195,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            /*
-            switch (position) {
-                case 0:
-                    return "Recommendations";
-                case 1:
-                    return "Your Food";
-                case 2:
-                    return "SECTION 3";
-            }
-            */
             return null;
         }
     }

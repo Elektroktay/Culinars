@@ -51,7 +51,7 @@ public class RecommendationsFragment extends Fragment {
         //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recommendation_recycler_view);
-        recyclerView.setHasFixedSize(true);
+        //recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
         recyclerView.setAdapter(new RecommendationsAdapter());
         recyclerView.addOnScrollListener(new HidingScrollListener() {

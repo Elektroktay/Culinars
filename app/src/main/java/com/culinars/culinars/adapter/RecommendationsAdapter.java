@@ -1,5 +1,6 @@
 package com.culinars.culinars.adapter;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -104,47 +106,67 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
     }
 
     //Front goes down.
-    public void closeCard(ViewHolder holder, int position) {
+    public void closeCard(final ViewHolder holder, int position) {
         holder.titleView.setSingleLine(false);
         holder.cardFrontContainer.animate()
                 .translationY(0)
                 .setInterpolator(new DecelerateInterpolator(2))
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {}
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        holder.cardBackContainer.setVisibility(View.GONE);
+                    }
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                })
+                .start();
+        holder.cardStarContainer.animate()
+                .alpha(1)
+                .setInterpolator(new DecelerateInterpolator(2))
+                .start();
+        holder.cardFavorite.animate()
+                .translationY((float) (holder.cardFrontContainer.getHeight() * 0.7))
+                .alpha(0)
+                .setInterpolator(new DecelerateInterpolator(2))
                 .start();
 
-        for (ImageView img : holder.stars) {
-            img.animate()
-                    .alpha(1)
-                    .setInterpolator(new DecelerateInterpolator(2))
-                    .start();
-        }
         cardFlipStates.put(position, false);
     }
 
     //Front goes up.
-    public void openCard(ViewHolder holder, int position) {
+    public void openCard(final ViewHolder holder, int position) {
         holder.titleView.setSingleLine(true);
+        holder.cardBackContainer.setVisibility(View.VISIBLE);
         holder.cardFrontContainer.animate()
-                .translationY(-(int) (holder.cardFrontContainer.getHeight() * 0.7))
+                .translationY(-(float) (holder.cardFrontContainer.getHeight() * 0.7))
+                .setInterpolator(new DecelerateInterpolator(2))
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        holder.cardBackContainer.setVisibility(View.VISIBLE);
+                    }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {}
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                })
+                .start();
+        holder.cardFavorite.animate()
+                .translationY(0)
+                .alpha(1)
                 .setInterpolator(new DecelerateInterpolator(2))
                 .start();
-/*        holder.cardImageContainer.animate()
-                .scaleY(0.3f)
-                .setInterpolator(new DecelerateInterpolator(2))
+        holder.cardStarContainer.animate()
+                .alpha(0)
+                .setInterpolator(new AccelerateInterpolator(2))
                 .start();
-        holder.imageViewGradient.animate()
-                .scaleY(0.3f)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        holder.imageView.animate()
-                .translationY((int) (holder.cardFrontContainer.getHeight() * 0.7 + holder.imageView.getHeight()/2))
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();*/
-        for (ImageView img : holder.stars) {
-            img.animate()
-                    .alpha(0)
-                    .setInterpolator(new DecelerateInterpolator(2))
-                    .start();
-        }
+
         cardFlipStates.put(position, true);
     }
 
@@ -165,6 +187,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
         public FrameLayout cardBackContainer;
         public RecyclerView cardFactsView;
         public TextView cardShortDescription;
+        public ImageView cardFavorite;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -180,6 +203,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
             cardBackContainer = (FrameLayout) itemView.findViewById(R.id.card_back_container);
             cardFactsView = (RecyclerView) itemView.findViewById(R.id.card_facts_view);
             cardShortDescription = (TextView) itemView.findViewById(R.id.card_short_description);
+            cardFavorite = (ImageView) itemView.findViewById(R.id.card_favorite);
 
             stars = new ImageView[] {
                     (ImageView) itemView.findViewById(R.id.card_rate_1),
