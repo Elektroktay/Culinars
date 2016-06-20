@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.culinars.culinars.MainActivity">
+    <item
+        android:id="@+id/action_user"
+        android:title="User"
+        app:showAsAction="always|collapseActionView"
+        android:icon="@drawable/account_circle_48" />
+    <item
+        android:id="@+id/action_settings"
+        android:visible="false"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>
