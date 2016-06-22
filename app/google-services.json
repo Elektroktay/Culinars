@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "266025503797",
+    "firebase_url": "https://project-8621167904068396320.firebaseio.com",
+    "project_id": "project-8621167904068396320",
+    "storage_bucket": "project-8621167904068396320.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266025503797:android:420cb87c05b68e12",
+        "android_client_info": {
+          "package_name": "com.culinars.culinars"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "266025503797-c7fgld15h58144daoprct8i75p47pf3g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.culinars.culinars",
+            "certificate_hash": "22064F07249EB527438D84D73C5D97D9FEF0C59E"
+          }
+        },
+        {
+          "client_id": "266025503797-85cq7ueevh7csooufaniui5it4b3thdb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWpwjkhylmF_S8Suuz4rLzd-7eRKS_iTU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "266025503797-85cq7ueevh7csooufaniui5it4b3thdb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

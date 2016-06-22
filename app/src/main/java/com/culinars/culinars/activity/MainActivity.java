@@ -1,6 +1,7 @@
-package com.culinars.culinars;
+package com.culinars.culinars.activity;
 
 import android.support.design.widget.TabLayout;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
+import com.culinars.culinars.R;
+import com.culinars.culinars.fragment.FavoritesFragment;
 import com.culinars.culinars.fragment.RecommendationsFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,6 +72,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+
+        //Drawer etup
+        final FrameLayout drawer = (FrameLayout) findViewById(R.id.main_drawer);
+        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(drawer);
+            }
+        });
 
     }
 
@@ -181,10 +197,11 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position > 0)
-                return PlaceholderFragment.newInstance(position + 1);
-            else
-                return RecommendationsFragment.newInstance(position + 1, (Toolbar) findViewById(R.id.toolbar));
+            switch (position) {
+                case 0: return RecommendationsFragment.newInstance((Toolbar) findViewById(R.id.toolbar));
+                case 1: return FavoritesFragment.newInstance((Toolbar) findViewById(R.id.toolbar));
+                default: return PlaceholderFragment.newInstance(position + 1);
+            }
         }
 
         @Override

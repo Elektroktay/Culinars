@@ -4,18 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/card_logo"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="20dp"
-        android:src="@drawable/culinars"/>
-
     <android.support.v7.widget.CardView
         android:id="@+id/card_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        app:cardElevation="2dp"
+        app:cardElevation="3dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginRight="16dp"
@@ -24,46 +17,170 @@
         android:layout_marginBottom="8dp"
         app:cardCornerRadius="3dp"
         app:cardUseCompatPadding="true"
+        app:cardBackgroundColor="@color/colorCardBackground"
         android:layout_height="256dp">
         <FrameLayout
             android:id="@+id/card_back_container"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:layout_marginTop="74dp">
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/card_facts_view"
-                android:layout_width="80dp"
-                android:layout_height="match_parent" />
+            android:layout_marginTop="79dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="3">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="5">
+                        <TextView
+                            android:id="@+id/card_calories_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="384"
+                            android:layout_marginTop="5dp"
+                            android:layout_gravity="center"
+                            android:textColor="@android:color/white"
+                            android:textSize="45sp"/>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2">
+                        <TextView
+                            android:id="@+id/card_calories_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="kcal"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"/>
+                    </FrameLayout>
+                </LinearLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/white"/>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="5">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/stopwatch"
+                            android:scaleType="centerInside" />
+                        <TextView
+                            android:id="@+id/card_time_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="30"
+                            android:paddingTop="5dp"
+                            android:textColor="@android:color/white"
+                            android:textSize="30sp"/>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2">
+                        <TextView
+                            android:id="@+id/card_time_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="mins"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"/>
+                    </FrameLayout>
+                </LinearLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/white"/>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="5">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="/"
+                            android:textColor="@android:color/white"
+                            android:textSize="60sp"/>
+                        <TextView
+                            android:id="@+id/card_ingredient_value1"
+                            android:layout_width="45dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|start"
+                            android:gravity="end"
+                            android:text="4"
+                            android:textColor="@android:color/white"
+                            android:textSize="30sp"
+                            android:layout_marginTop="10dp"
+                            android:textAlignment="gravity"/>
+                        <TextView
+                            android:id="@+id/card_ingredient_value2"
+                            android:layout_width="47dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|bottom"
+                            android:text="20"
+                            android:gravity="start"
+                            android:textColor="@android:color/white"
+                            android:textSize="30sp"
+                            android:textAlignment="gravity"/>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2">
+                        <TextView
+                            android:id="@+id/card_ingredient_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ingredients"
+                            android:layout_gravity="center"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/white"/>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
             <TextView
-                android:id="@+id/card_short_description"
-                android:layout_width="match_parent"
+                android:id="@+id/card_difficulty_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:layout_marginStart="80dp"
-                android:layout_marginBottom="50dp"
-                android:padding="8dp"
-                android:textSize="12sp"
-                android:text="@string/large_text"/>
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/card_ingredients_view"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="80dp"
-                android:layout_marginStart="80dp"
-                android:layout_marginRight="60dp"
-                android:layout_marginEnd="60dp"
-                android:layout_gravity="bottom|end">
-
-            </android.support.v7.widget.RecyclerView>
+                android:text="medium"
+                android:layout_gravity="center_horizontal|bottom"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="5dp"/>
         </FrameLayout>
         <!--
             android:translationY="-179dp" -->
         <FrameLayout
+            android:translationY="-179dp"
             android:id="@+id/card_front_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -129,6 +246,25 @@
                     android:src="@drawable/ic_star_border_white_48dp"/>
             </RelativeLayout>
         </FrameLayout>
+        <android.support.v7.widget.CardView
+            android:scaleX="0.000000000000001"
+            android:scaleY="0.000000000000001"
+            android:id="@+id/cook_button"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="60dp"
+            app:cardBackgroundColor="@color/colorAccent"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="7dp">
+            <TextView
+                android:id="@+id/cook_button_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="cook now"
+                android:textColor="@android:color/white"/>
+        </android.support.v7.widget.CardView>
         <TextView
             android:id="@+id/card_title"
             android:layout_width="wrap_content"
@@ -144,10 +280,10 @@
             android:translationY="179dp"
             android:alpha="0"
             android:id="@+id/card_favorite"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/heart_outline"
             android:layout_gravity="top|end"
-            android:layout_margin="16dp" />
+            android:layout_margin="24dp" />
     </android.support.v7.widget.CardView>
 </FrameLayout>
