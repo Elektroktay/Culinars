@@ -1,4 +1,4 @@
-package com.culinars.culinars.adapter;
+package com.culinars.culinars.adapter.main;
 
 /**
  * Created by Oktayşen on 21/6/2016.

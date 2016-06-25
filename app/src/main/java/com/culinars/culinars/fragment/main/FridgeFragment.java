@@ -1,8 +1,8 @@
-package com.culinars.culinars.fragment;
+package com.culinars.culinars.fragment.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -11,30 +11,28 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import com.culinars.culinars.HidingScrollListener;
 import com.culinars.culinars.R;
-import com.culinars.culinars.adapter.FavoritesAdapter;
-import com.culinars.culinars.adapter.RecommendationsAdapter;
+import com.culinars.culinars.adapter.main.FridgeAdapter;
 
 /**
  * Created by Oktayşen on 21/6/2016.
  */
-public class FavoritesFragment extends Fragment {
+public class FridgeFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private Toolbar toolbar;
 
-    public FavoritesFragment() {
+    public FridgeFragment() {
     }
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FavoritesFragment newInstance(Toolbar toolbar) {
-        FavoritesFragment fragment = new FavoritesFragment();
+    public static FridgeFragment newInstance(Toolbar toolbar) {
+        FridgeFragment fragment = new FridgeFragment();
         fragment.toolbar = toolbar;
         return fragment;
     }
@@ -42,24 +40,13 @@ public class FavoritesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_favorites, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_fridge, container, false);
         //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.favorite_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fridge_recycler_view);
         //recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
-        recyclerView.setAdapter(new FavoritesAdapter());
-        recyclerView.addOnScrollListener(new HidingScrollListener() {
-            @Override
-            public void onHide() {
-                hideViews();
-            }
-
-            @Override
-            public void onShow() {
-                showViews();
-            }
-        });
+        recyclerView.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2));
+        recyclerView.setAdapter(new FridgeAdapter());
         return rootView;
     }
 

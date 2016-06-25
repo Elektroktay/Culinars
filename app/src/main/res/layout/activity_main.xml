@@ -30,38 +30,46 @@
                 android:layout_height="match_parent"/>
 
             <android.support.design.widget.AppBarLayout
+                android:id="@+id/toolbar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                app:elevation="0dp">
+                android:background="@color/colorTabBackground"
+                app:elevation="5dp">
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
                         android:layout_marginTop="25dp"
                         app:popupTheme="@style/AppTheme.PopupOverlay"
-                        android:background="@android:color/transparent"
                         app:layout_scrollFlags="scroll|enterAlways"
                         android:theme="@style/AppTheme.AppBarOverlay" >
-
-            <!--            <android.support.v7.widget.SearchView
+                        <android.support.v7.widget.SearchView
                             android:id="@+id/search_view"
-                            android:layout_width="match_parent"
+                            android:layout_width="50dp"
                             android:layout_height="match_parent"
-                            android:queryHint="Search recipes"
-                            />-->
+                            app:queryHint="Search recipes"
+                            app:showDividers="middle"
+                            app:iconifiedByDefault="true"
+                            />
                         <ImageView
-                            android:id="@+id/card_logo"
-                            android:layout_width="match_parent"
+                            android:id="@+id/app_logo"
+                            android:layout_width="190dp"
                             android:layout_height="match_parent"
-                            android:src="@drawable/culinars"/>
-                        <ImageButton
+                            android:layout_gravity="center"
+                            android:src="@drawable/culinars_white"/>
+<!--                        <ImageButton
                             android:id="@+id/search_button"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
+                            android:layout_gravity="start"
                             android:src="@android:drawable/ic_menu_search"
-                            android:background="@android:color/transparent"/>
+                            android:background="@android:color/transparent"/>-->
                         </android.support.v7.widget.Toolbar>
+                <include layout="@layout/fragment_search_extra"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    android:layout_gravity="top"/>
             </android.support.design.widget.AppBarLayout>
             <!--
             <android.support.design.widget.FloatingActionButton

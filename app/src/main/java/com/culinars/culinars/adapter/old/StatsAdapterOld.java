@@ -1,8 +1,7 @@
-package com.culinars.culinars.adapter;
+package com.culinars.culinars.adapter.old;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 import com.culinars.culinars.R;
 
 
-public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.ViewHolder> {
+public class StatsAdapterOld extends RecyclerView.Adapter<StatsAdapterOld.ViewHolder> {
 
     Context context;
     RecyclerView parentRecyclerView;

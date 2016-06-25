@@ -39,6 +39,8 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:9.0.2'
     compile 'com.firebaseui:firebase-ui:0.3.1'
     compile 'com.eightbitlab:blurview:1.0.4'
+    compile 'com.android.support:support-v4:23.4.0'
 }
+
 
 apply plugin: 'com.google.gms.google-services'

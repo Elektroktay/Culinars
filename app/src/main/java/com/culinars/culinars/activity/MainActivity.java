@@ -1,9 +1,10 @@
 package com.culinars.culinars.activity;
 
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -16,24 +17,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import com.culinars.culinars.MainPageChangeListener;
 import com.culinars.culinars.R;
-import com.culinars.culinars.fragment.FavoritesFragment;
-import com.culinars.culinars.fragment.RecommendationsFragment;
+import com.culinars.culinars.fragment.main.FavoritesFragment;
+import com.culinars.culinars.fragment.main.FridgeFragment;
+import com.culinars.culinars.fragment.main.RecommendationsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    public ImageView appLogo;
+    public Toolbar toolbar;
+    public AppBarLayout appBarLayout;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -46,14 +42,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Toolbar setup
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        appBarLayout = (AppBarLayout) findViewById(R.id.toolbar_container);
+
         //ViewPager setup
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(pagerAdapter);
+        mViewPager.addOnPageChangeListener(new MainPageChangeListener(toolbar, appBarLayout));
 
         //Tabs setup
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -73,16 +80,47 @@ public class MainActivity extends AppCompatActivity {
         });
         */
 
+        //SearchSetup
+
+        appLogo = (ImageView) findViewById(R.id.app_logo);
+
+        final SearchView searchView = (SearchView) findViewById(R.id.search_view);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.appLogo.setVisibility(View.GONE);
+                searchView.setLayoutParams(new android.support.v7.widget.Toolbar.LayoutParams(
+                        android.support.v7.widget.Toolbar.LayoutParams.MATCH_PARENT,
+                        android.support.v7.widget.Toolbar.LayoutParams.MATCH_PARENT
+                ));
+                AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) MainActivity.this.toolbar.getLayoutParams();
+                layoutParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                MainActivity.this.appLogo.setVisibility(View.VISIBLE);
+                searchView.setLayoutParams(new android.support.v7.widget.Toolbar.LayoutParams(
+                        50,
+                        android.support.v7.widget.Toolbar.LayoutParams.MATCH_PARENT
+                ));
+                AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) MainActivity.this.toolbar.getLayoutParams();
+                layoutParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL|AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+                return false;
+            }
+        });
+
         //Drawer etup
-        final FrameLayout drawer = (FrameLayout) findViewById(R.id.main_drawer);
-        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
+//        final FrameLayout drawer = (FrameLayout) findViewById(R.id.main_drawer);
+//        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+/*        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(drawer);
             }
-        });
+        });*/
 
     }
 
@@ -92,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         //Setup user button
         MenuItem userButton = menu.findItem(R.id.action_user);
+        if (userButton == null)
+            return true;
         userButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -187,9 +227,9 @@ public class MainActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class PagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -200,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
             switch (position) {
                 case 0: return RecommendationsFragment.newInstance((Toolbar) findViewById(R.id.toolbar));
                 case 1: return FavoritesFragment.newInstance((Toolbar) findViewById(R.id.toolbar));
+                case 2: return FridgeFragment.newInstance((Toolbar) findViewById(R.id.toolbar));
                 default: return PlaceholderFragment.newInstance(position + 1);
             }
         }

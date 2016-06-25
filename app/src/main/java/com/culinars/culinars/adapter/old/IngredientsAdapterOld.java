@@ -1,8 +1,7 @@
-package com.culinars.culinars.adapter;
+package com.culinars.culinars.adapter.old;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 
 import com.culinars.culinars.R;
 
-public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.ViewHolder> {
+public class IngredientsAdapterOld extends RecyclerView.Adapter<IngredientsAdapterOld.ViewHolder> {
 
     Context context;
     RecyclerView parentRecyclerView;
@@ -24,7 +23,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
                 .inflate(R.layout.fragment_ingredient_cards, parent, false);
 
         parentRecyclerView = (RecyclerView) parent.findViewById(R.id.card_ingredients_view);
-        StatsAdapter.setUpTapToScroll(parentRecyclerView, v, 4);
+        StatsAdapterOld.setUpTapToScroll(parentRecyclerView, v, 4);
         return new ViewHolder(v);
     }
 

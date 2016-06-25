@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.culinars.culinars.fragment.RecommendationsFragment">
+    tools:context=".fragment.main.RecommendationsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recommendation_recycler_view"
         android:scrollbars="vertical"
+        android:paddingTop="85dp"
         android:paddingBottom="48dp"
         android:clipToPadding="false"
         android:layout_width="match_parent"

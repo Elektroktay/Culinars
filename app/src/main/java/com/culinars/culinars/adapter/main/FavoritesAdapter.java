@@ -1,4 +1,4 @@
-package com.culinars.culinars.adapter;
+package com.culinars.culinars.adapter.main;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -25,18 +25,22 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.favorite_image.setImageResource(R.drawable.cooking_prep3);
         holder.favorite_number.setText("" + (position * 5));
         switch (position) {
             case 0: holder.favorite_text.setText("All Favorites");
+                holder.favorite_image.setImageResource(R.drawable.all_favorites);
                 break;
             case 1: holder.favorite_text.setText("Drinks");
+                holder.favorite_image.setImageResource(R.drawable.drinks);
                 break;
             case 2: holder.favorite_text.setText("Deserts");
+                holder.favorite_image.setImageResource(R.drawable.deserts);
                 break;
             case 3: holder.favorite_text.setText("Dinners");
+                holder.favorite_image.setImageResource(R.drawable.dinners);
                 break;
             case 4: holder.favorite_text.setText("Breakfasts");
+                holder.favorite_image.setImageResource(R.drawable.breakfasts);
                 break;
             default: holder.favorite_text.setText("Stuff");
                 holder.favorite_image.setImageResource(R.drawable.cooking_prep3);
