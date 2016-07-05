@@ -10,47 +10,29 @@ import android.view.ViewGroup;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.adapter.recipe.RecipeIngredientsAdapter;
+import com.culinars.culinars.data.structure.Recipe;
 
 
 public class RecipeIngredientsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    Recipe currentRecipe;
 
     public RecipeIngredientsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RecipeIngredientsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RecipeIngredientsFragment newInstance(String param1, String param2) {
+    public void setCurrentRecipe(Recipe currentRecipe) {
+        this.currentRecipe = currentRecipe;
+    }
+
+    public static RecipeIngredientsFragment newInstance(Recipe currentRecipe) {
         RecipeIngredientsFragment fragment = new RecipeIngredientsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        fragment.setCurrentRecipe(currentRecipe);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -64,7 +46,7 @@ public class RecipeIngredientsFragment extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RecipeIngredientsAdapter());
+        recyclerView.setAdapter(new RecipeIngredientsAdapter(currentRecipe));
 
         return rootView;
     }

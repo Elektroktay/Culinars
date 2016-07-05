@@ -3,6 +3,7 @@ package com.culinars.culinars.adapter.main;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.ReferenceMultiple;
+import com.culinars.culinars.data.structure.Ingredient;
 
 public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder> {
 
     Context context;
+    int dataLimit;
+    private ReferenceMultiple<Ingredient> data;
+
+
+    public FridgeAdapter() {
+        dataLimit = 100;
+        refreshData("");
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -23,47 +35,68 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         return new ViewHolder(v);
     }
 
+    public void refreshData(String completionText) {
+        data = DataManager.getInstance().findIngredient(completionText, dataLimit);
+        data.addOnDataChangeListener(new ReferenceMultiple.OnDataChangeListener<Ingredient>() {
+            @Override
+            public void onDataChange(Ingredient newValue, int event) {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.fridge_number.setText("" + (position * 5));
-        switch (position) {
-            case 0: holder.fridge_text.setText("All Favorites");
-                holder.fridge_image.setImageResource(R.drawable.all_favorites);
-                break;
-            case 1: holder.fridge_text.setText("Drinks");
-                holder.fridge_image.setImageResource(R.drawable.drinks);
-                break;
-            case 2: holder.fridge_text.setText("Deserts");
-                holder.fridge_image.setImageResource(R.drawable.deserts);
-                break;
-            case 3: holder.fridge_text.setText("Dinners");
-                holder.fridge_image.setImageResource(R.drawable.dinners);
-                break;
-            case 4: holder.fridge_text.setText("Breakfasts");
-                holder.fridge_image.setImageResource(R.drawable.breakfasts);
-                break;
-            default: holder.fridge_text.setText("Stuff");
-                holder.fridge_image.setImageResource(R.drawable.cooking_prep3);
-                break;
-        }
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        if (DataManager.getInstance().hasIngredient(data.getValueAt(position).name))
+            holder.fridge_check.setImageResource(R.drawable.check_green);
+        else
+            holder.fridge_check.setImageResource(R.drawable.check_white);
+
+        holder.fridge_text.setText(data.getValueAt(position).name);
+        holder.fridge_image.setImageResource(R.drawable.cooking_prep3);
+        holder.fridge_container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (DataManager.getInstance().hasIngredient(data.getValueAt(position).name)) {
+                    DataManager.getInstance().setIngredient(data.getValueAt(position).name, false);
+                    holder.fridge_check.setImageResource(R.drawable.check_white);
+                } else {
+                    DataManager.getInstance().setIngredient(data.getValueAt(position).name, true);
+                    holder.fridge_check.setImageResource(R.drawable.check_green);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 20;
+        if (data != null)
+            return data.getValues().size();
+        else
+            return 5;
+    }
+
+    public void updateSearchParams(String searchQuery) {
+        if (searchQuery.length() > 1) {
+            String firstLetter = searchQuery.substring(0, 1);
+            String rest = searchQuery.substring(1);
+            refreshData(firstLetter.toUpperCase() + rest);
+        } else {
+            refreshData(searchQuery);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         CardView fridge_container;
-        ImageView fridge_image;
-        TextView fridge_text, fridge_number;
+        ImageView fridge_image, fridge_check;
+        TextView fridge_text;
 
         public ViewHolder(View itemView) {
             super(itemView);
             fridge_container = (CardView) itemView.findViewById(R.id.card_fridge_container);
             fridge_image = (ImageView) itemView.findViewById(R.id.card_fridge_image);
             fridge_text = (TextView) itemView.findViewById(R.id.card_fridge_text);
-            fridge_number = (TextView) itemView.findViewById(R.id.card_fridge_number);
+            fridge_check = (ImageView) itemView.findViewById(R.id.card_fridge_check);
         }
     }
 }

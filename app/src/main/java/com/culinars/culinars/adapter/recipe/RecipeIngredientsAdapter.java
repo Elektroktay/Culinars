@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,31 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.structure.Ingredient;
+import com.culinars.culinars.data.structure.Recipe;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredientsAdapter.ViewHolder> {
 
     Context context;
+    Recipe currentRecipe;
+    ArrayList<String> ingredients;
+    int servings;
+
+    public RecipeIngredientsAdapter(Recipe currentRecipe) {
+        servings = 1;
+        this.currentRecipe = currentRecipe;
+        if (currentRecipe.ingredients != null) {
+            ingredients = new ArrayList<>();
+            for (String ing : currentRecipe.ingredients.keySet()) {
+                ingredients.add(ing);
+                Log.i("Ingredient_add", ing);
+            }
+        }
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -44,24 +66,34 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (getItemViewType(position) == 0) {
-            holder.ingredients_title.setText("Apples");
-            holder.ingredients_amount.setText((position * 100) + " grams");
+            holder.ingredients_title.setText(ingredients.get(position));
+            holder.ingredients_amount.setText(currentRecipe.ingredients.get(ingredients.get(position)) + " gr");
+
+            if (DataManager.getInstance().hasIngredient(ingredients.get(position))) {
+                holder.ingredients_title.setTextColor(Color.WHITE);
+                holder.ingredients_amount.setTextColor(Color.WHITE);
+            } else {
+                holder.ingredients_title.setTextColor(Color.parseColor("#B91010"));
+                holder.ingredients_amount.setTextColor(Color.parseColor("#B91010"));
+            }
+
             if (position % 2 == 0) {
-                holder.ingredients_title.setTextColor(Color.GREEN);
-                holder.ingredients_amount.setTextColor(Color.GREEN);
                 holder.ingredients_card.setBackgroundColor(Color.TRANSPARENT);
             } else {
-                holder.ingredients_title.setTextColor(Color.RED);
-                holder.ingredients_amount.setTextColor(Color.RED);
                 holder.ingredients_card.setBackgroundColor(Color.parseColor("#1AFFFFFF"));
             }
+        } else if (getItemViewType(position) == 1) {
+
         }
         //holder.ingredients_checkbox.setChecked(position%2==0);
     }
 
     @Override
     public int getItemCount() {
-        return 13;
+        if (currentRecipe.ingredients != null)
+            return currentRecipe.ingredients.size()+1;
+        else
+            return 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

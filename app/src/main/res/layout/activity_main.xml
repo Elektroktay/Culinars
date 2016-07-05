@@ -29,48 +29,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
-            <android.support.design.widget.AppBarLayout
-                android:id="@+id/toolbar_container"
+<!--            <eightbitlab.com.blurview.BlurView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorTabBackground"
-                app:elevation="5dp">
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_marginTop="25dp"
-                        app:popupTheme="@style/AppTheme.PopupOverlay"
-                        app:layout_scrollFlags="scroll|enterAlways"
-                        android:theme="@style/AppTheme.AppBarOverlay" >
-                        <android.support.v7.widget.SearchView
-                            android:id="@+id/search_view"
-                            android:layout_width="50dp"
-                            android:layout_height="match_parent"
-                            app:queryHint="Search recipes"
-                            app:showDividers="middle"
-                            app:iconifiedByDefault="true"
-                            />
-                        <ImageView
-                            android:id="@+id/app_logo"
-                            android:layout_width="190dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:src="@drawable/culinars_white"/>
-<!--                        <ImageButton
-                            android:id="@+id/search_button"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_gravity="start"
-                            android:src="@android:drawable/ic_menu_search"
-                            android:background="@android:color/transparent"/>-->
-                        </android.support.v7.widget.Toolbar>
+                app:blurOverlayColor="@color/colorTabBackground"
+                android:id="@+id/blurView">-->
                 <include layout="@layout/fragment_search_extra"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="85dp"
                     app:layout_scrollFlags="scroll|enterAlways"
                     android:layout_gravity="top"/>
-            </android.support.design.widget.AppBarLayout>
+                <android.support.design.widget.AppBarLayout
+                    android:id="@+id/toolbar_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/toolbar_transition"
+                    app:elevation="5dp">
+                        <android.support.v7.widget.Toolbar
+                            android:id="@+id/toolbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:layout_marginTop="25dp"
+                            app:popupTheme="@style/AppTheme.PopupOverlay"
+                            app:layout_scrollFlags="scroll|enterAlways"
+                            android:theme="@style/AppTheme.AppBarOverlay" >
+                            <android.support.v7.widget.SearchView
+                                android:id="@+id/search_view"
+                                android:layout_width="50dp"
+                                android:layout_height="match_parent"
+                                app:queryHint="Search recipes"
+                                app:showDividers="middle"
+                                app:iconifiedByDefault="true"
+                                />
+                            <ImageView
+                                android:id="@+id/app_logo"
+                                android:layout_width="190dp"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:src="@drawable/culinars_white"/>
+    <!--                        <ImageButton
+                                android:id="@+id/search_button"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_gravity="start"
+                                android:src="@android:drawable/ic_menu_search"
+                                android:background="@android:color/transparent"/>-->
+                            </android.support.v7.widget.Toolbar>
+                </android.support.design.widget.AppBarLayout>
+            <!--</eightbitlab.com.blurview.BlurView>-->
             <!--
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

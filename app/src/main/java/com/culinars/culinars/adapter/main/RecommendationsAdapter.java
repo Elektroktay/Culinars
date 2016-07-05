@@ -1,289 +1,73 @@
 package com.culinars.culinars.adapter.main;
 
-import android.animation.Animator;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetManager;
-import android.graphics.Typeface;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.activity.RecipeActivity;
+import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.Reference;
+import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.structure.User;
 
-import java.util.HashMap;
-import java.util.Map;
 
-public class RecommendationsAdapter extends RecyclerView.Adapter<RecommendationsAdapter.ViewHolder> {
+public class RecommendationsAdapter extends RecipeAdapter {
 
-    Context context;
-    ViewGroup parent;
-    Map<Integer, Boolean> cardFlipStates;
+    int resultCount;
+    public ReferenceMultipleFromKeys<Recipe> data;
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_recommendations_card, parent, false);
-        context = parent.getContext();
-        this.parent = parent;
-        cardFlipStates = new HashMap<>();
-        return new ViewHolder(v);
+    public RecommendationsAdapter() {
+        this(10);
+    }
+
+    public RecommendationsAdapter(int initResultCount) {
+        resultCount = initResultCount;
+        refreshData();
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        cardFlipStates.put(position, false);
-        holder.titleView.setText("Very Long Recipe Title of DOOM " + position);
-        AssetManager am = context.getApplicationContext().getAssets();
-        holder.titleView.setTypeface(Typeface.createFromAsset(am, "fonts/segoe_ui_light.ttf"));
-        holder.imageView.setImageResource(R.drawable.pizza);
-        int points = 7;
-        for (ImageView img : holder.stars) {
-            if (points > 1) {
-                img.setImageResource(R.drawable.ic_star_white_48dp);
-                points -= 2;
-            } else if (points == 1) {
-                img.setImageResource(R.drawable.ic_star_half_white_48dp);
-                points -= 1;
-            } else {
-                img.setImageResource(R.drawable.ic_star_border_white_48dp);
-            }
+    public Recipe getDataAtPos(int position) {
+        return data.getValueAt(position);
+    }
+
+    @Override
+    public void onFavoriteClick(final int position, final ImageView cardFavorite) {
+        if (getDataAtPos(position).isFavorite()) {
+            DataManager.getInstance().setFavorite(getDataAtPos(position).uid, false);
+            cardFavorite.setImageResource(R.drawable.heart_outline);
+        } else {
+            DataManager.getInstance().setFavorite(getDataAtPos(position).uid, true);
+            cardFavorite.setImageResource(R.drawable.heart);
         }
 
-        holder.container.setOnClickListener(new View.OnClickListener() {
+/*        DataManager.getInstance().getUser().addOnDataReadyListener(new Reference.OnDataReadyListener<User>() {
             @Override
-            public void onClick(View v) {
-                flipCard(holder, holder.getAdapterPosition());
+            public void onDataReady(User value) {
+                if (value.favorites != null && value.favorites.containsKey(getDataAtPos(position).uid)) {
+                    DataManager.getInstance().setFavorite(getDataAtPos(position).uid, false);
+                    cardFavorite.setImageResource(R.drawable.heart_outline);
+                } else {
+                    DataManager.getInstance().setFavorite(getDataAtPos(position).uid, true);
+                    cardFavorite.setImageResource(R.drawable.heart);
+                }
+            }
+        });*/
+    }
+
+    public void refreshData() {
+        data = DataManager.getInstance().getRecommendations(DataManager.getInstance().getCurrentUser().getUid(), resultCount);
+        data.addOnDataChangeListener(new ReferenceMultipleFromKeys.OnDataChangeListener<Recipe>() {
+            @Override
+            public void onDataChange(Recipe newValue, int event) {
+                notifyDataSetChanged();
             }
         });
-
-        //Back
-//            holder.cardShortDescription.setText(R.string.large_text);
-//            setUpFactsViev(holder);
-//            setUpIngredientsView(holder);
-        setUpCalories(holder, position*50, "calories");
-        setUpTime(holder, position*5, "hrs");
-        setUpIngredients(holder, 20, 20);
-        setUpDifficulty(holder, "medium");
-
-
-        holder.cookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Open Ingredient Screen", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, RecipeActivity.class);
-                intent.putExtra("key", "value");
-                context.startActivity(intent);
-            }
-        });
-    }
-
-    private void setUpDifficulty(ViewHolder holder, String difficulty) {
-        holder.cardDifficultyText.setText(difficulty);
-    }
-
-    private void setUpIngredients(ViewHolder holder, int value, int maxIngredients) {
-        holder.cardIngredientValue1.setText(""+value);
-        holder.cardIngredientValue2.setText(""+maxIngredients);
-        holder.cardIngredientUnit.setText("ingredients");
-    }
-
-    private void setUpTime(ViewHolder holder, int value, String unit) {
-        holder.cardTimeValue.setText("2:30");
-        holder.cardTimeUnit.setText(unit);
-    }
-
-    private void setUpCalories(ViewHolder holder, int value, String unit) {
-        holder.cardCaloriesValue.setText("" + value);
-        holder.cardCaloriesUnit.setText(unit);
-    }
-
-    /*
-    private void setUpIngredientsView(ViewHolder holder) {
-        holder.cardIngredientsView.setHasFixedSize(true);
-        holder.cardIngredientsView.setAdapter(new IngredientsAdapterOld());
-        holder.cardIngredientsView.setLayoutManager(new CustomSpeedLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, 1000));
-        holder.cardIngredientsView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                return rv.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING;
-            }
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {}
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
-        });
-    } */
-
-    /*
-    private void setUpFactsViev(ViewHolder holder) {
-        holder.cardFactsView.setHasFixedSize(true);
-        holder.cardFactsView.setAdapter(new StatsAdapterOld());
-        holder.cardFactsView.setLayoutManager(new CustomSpeedLinearLayoutManager(context, 1000));
-        holder.cardFactsView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                //holder.cardFactsView.smoothScrollBy(0, 1);
-                return rv.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING;
-            }
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {}
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
-        });
-    } */
-
-    private void flipCard(ViewHolder holder, final int position) {
-        final Integer pos = position;
-        if (cardFlipStates.get(pos) == null || cardFlipStates.get(pos).equals(false)) {
-            openCard(holder, position);
-        } else if (cardFlipStates.get(pos).equals(true)) {
-            closeCard(holder, position);
-        }
-    }
-
-    //Front goes down.
-    public void closeCard(final ViewHolder holder, int position) {
-        holder.titleView.setSingleLine(false);
-        holder.cardFrontContainer.animate()
-                .translationY(0)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {}
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        holder.cardBackContainer.setVisibility(View.GONE);
-                    }
-                    @Override
-                    public void onAnimationCancel(Animator animation) {}
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {}
-                })
-                .start();
-        holder.cardStarContainer.animate()
-                .alpha(1)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        holder.cardFavorite.animate()
-                .translationY((float) (holder.cardFrontContainer.getHeight() * 0.7))
-                .alpha(0)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-
-        holder.cookButton.animate()
-                .scaleY(0)
-                .scaleX(0)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        cardFlipStates.put(position, false);
-    }
-
-    //Front goes up.
-    public void openCard(final ViewHolder holder, int position) {
-        holder.titleView.setSingleLine(true);
-        holder.cardBackContainer.setVisibility(View.VISIBLE);
-        holder.cardFrontContainer.animate()
-                .translationY(-(float) (holder.cardFrontContainer.getHeight() * 0.7))
-                .setInterpolator(new DecelerateInterpolator(2))
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        holder.cardBackContainer.setVisibility(View.VISIBLE);
-                    }
-                    @Override
-                    public void onAnimationEnd(Animator animation) {}
-                    @Override
-                    public void onAnimationCancel(Animator animation) {}
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {}
-                })
-                .start();
-        holder.cardFavorite.animate()
-                .translationY(0)
-                .alpha(1)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        holder.cardStarContainer.animate()
-                .alpha(0)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-
-        holder.cookButton.animate()
-                .setStartDelay(1)
-                .scaleY(1)
-                .scaleX(1)
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-
-        cardFlipStates.put(position, true);
     }
 
     @Override
     public int getItemCount() {
-        return 10;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView, logoView;
-        public ImageView[] stars;
-        public TextView titleView;
-        public FrameLayout cardImageContainer, cardFrontContainer;
-        public RelativeLayout cardStarContainer;
-        public View imageViewGradient;
-        public CardView container;
-
-        public FrameLayout cardBackContainer;
-        public TextView cardCaloriesValue, cardCaloriesUnit;
-        public TextView cardTimeValue, cardTimeUnit;
-        public TextView cardIngredientValue1, cardIngredientValue2, cardIngredientUnit;
-        public TextView cardDifficultyText;
-        public ImageView cardFavorite;
-
-        public CardView cookButton;
-        public TextView cookButtonText;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            titleView = (TextView) itemView.findViewById(R.id.card_title);
-            logoView = (ImageView) itemView.findViewById(R.id.app_logo);
-            cardImageContainer = (FrameLayout) itemView.findViewById(R.id.card_image_container);
-            imageView = (ImageView) itemView.findViewById(R.id.card_image);
-            imageViewGradient = itemView.findViewById(R.id.card_image_gradient);
-            container = (CardView) itemView.findViewById(R.id.card_container);
-            cardFrontContainer = (FrameLayout) itemView.findViewById(R.id.card_front_container);
-            cardStarContainer = (RelativeLayout) itemView.findViewById(R.id.star_container);
-
-            cardBackContainer = (FrameLayout) itemView.findViewById(R.id.card_back_container);
-            cardCaloriesValue = (TextView) itemView.findViewById(R.id.card_calories_value);
-            cardCaloriesUnit = (TextView) itemView.findViewById(R.id.card_calories_unit);
-            cardTimeValue = (TextView) itemView.findViewById(R.id.card_time_value);
-            cardTimeUnit = (TextView) itemView.findViewById(R.id.card_time_unit);
-            cardIngredientValue1 = (TextView) itemView.findViewById(R.id.card_ingredient_value1);
-            cardIngredientValue2 = (TextView) itemView.findViewById(R.id.card_ingredient_value2);
-            cardIngredientUnit = (TextView) itemView.findViewById(R.id.card_ingredient_unit);
-            cardDifficultyText = (TextView) itemView.findViewById(R.id.card_difficulty_text);
-
-            cardFavorite = (ImageView) itemView.findViewById(R.id.card_favorite);
-            cookButton = (CardView) itemView.findViewById(R.id.cook_button);
-            cookButtonText = (TextView) itemView.findViewById(R.id.cook_button_text);
-
-            stars = new ImageView[] {
-                    (ImageView) itemView.findViewById(R.id.card_rate_1),
-                    (ImageView) itemView.findViewById(R.id.card_rate_2),
-                    (ImageView) itemView.findViewById(R.id.card_rate_3),
-                    (ImageView) itemView.findViewById(R.id.card_rate_4),
-                    (ImageView) itemView.findViewById(R.id.card_rate_5)
-            };
-        }
+        if (data != null)
+            return data.getValues().size()+1;
+        else
+            return 1;
     }
 }

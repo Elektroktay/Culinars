@@ -10,10 +10,32 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.fragment.main.FavoritesFragment;
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.ViewHolder> {
 
     Context context;
+    ReferenceMultipleFromKeys<Recipe> data;
+    FavoritesFragment fragment;
+
+    public FavoritesAdapter(FavoritesFragment fragment) {
+        this.fragment = fragment;
+        refreshData();
+    }
+
+    private void refreshData() {
+        data = DataManager.getInstance().getFavorites();
+        data.addOnDataChangeListener(new ReferenceMultipleFromKeys.OnDataChangeListener<Recipe>() {
+
+            @Override
+            public void onDataChange(Recipe newValue, int event) {
+                notifyDataSetChanged();
+            }
+        });
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -25,10 +47,19 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.favorite_number.setText("" + (position * 5));
+        if (position == 0)
+            holder.favorite_number.setText("" + data.getValues().size());
+        else
+            holder.favorite_number.setText("0");
         switch (position) {
             case 0: holder.favorite_text.setText("All Favorites");
                 holder.favorite_image.setImageResource(R.drawable.all_favorites);
+                holder.favorite_container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fragment.setAdapter(new FavoritesAdapter2());
+                    }
+                });
                 break;
             case 1: holder.favorite_text.setText("Drinks");
                 holder.favorite_image.setImageResource(R.drawable.drinks);

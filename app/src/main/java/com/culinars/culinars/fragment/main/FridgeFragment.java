@@ -23,6 +23,8 @@ public class FridgeFragment extends Fragment {
      * fragment.
      */
     private Toolbar toolbar;
+    public RecyclerView recyclerView;
+    private FridgeAdapter adapter;
 
     public FridgeFragment() {
     }
@@ -34,6 +36,7 @@ public class FridgeFragment extends Fragment {
     public static FridgeFragment newInstance(Toolbar toolbar) {
         FridgeFragment fragment = new FridgeFragment();
         fragment.toolbar = toolbar;
+        fragment.adapter = new FridgeAdapter();
         return fragment;
     }
 
@@ -43,10 +46,10 @@ public class FridgeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_fridge, container, false);
         //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fridge_recycler_view);
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2));
-        recyclerView.setAdapter(new FridgeAdapter());
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.fridge_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(rootView.getContext(), 3));
+        recyclerView.setAdapter(adapter);
         return rootView;
     }
 
@@ -61,5 +64,9 @@ public class FridgeFragment extends Fragment {
         if (toolbar != null) {
             toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
         }
+    }
+
+    public void searchWith(String searchQuery) {
+        adapter.updateSearchParams(searchQuery);
     }
 }

@@ -8,5 +8,7 @@
     <color name="colorTabText">#FFCDBC</color>
     <color name="colorCardBackground">#33000000</color>
     <color name="colorTabBackground">#59000000</color>
+    <color name="colorTabLighterBackground">#33000000</color>
+    <color name="colorTabDarkerBackground">#B3000000</color>
     <color name="colorTabSelectedText">#FFFFFF</color>
 </resources>

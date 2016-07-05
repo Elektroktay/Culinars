@@ -32,35 +32,50 @@
             android:fitsSystemWindows="true"
             android:focusableInTouchMode="true"
             android:layout_height="85dp"/>
-        <com.culinars.culinars.FixedNestedScrollView
-            android:id="@+id/recipe_bottom_sheet"
-            android:layout_marginTop="70dp"
+        <FrameLayout
+            android:id="@+id/recipe_bottom_sheet_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <FrameLayout
+                android:layout_height="match_parent"
+                android:layout_marginTop="85dp">
+                <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp">
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/wooden_bg"
-                        android:fitsSystemWindows="true"
-                        android:scaleType="centerCrop"/>
-                    <android.support.v4.view.ViewPager
-                        android:layout_marginTop="55dp"
-                        android:id="@+id/recipe_view_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                </FrameLayout>
-                <FrameLayout
-                    android:id="@+id/button_slide_container"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/wooden_bg"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorTabLighterBackground"/>
+            </FrameLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="85dp">
+                <com.culinars.culinars.FixedNestedScrollView
+                    android:id="@+id/recipe_bottom_sheet"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <com.culinars.culinars.WrapContentViewPager
+                            android:layout_marginTop="55dp"
+                            android:id="@+id/recipe_view_pager"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </FrameLayout>
+                </com.culinars.culinars.FixedNestedScrollView>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/button_slide_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="70dp">
                 <android.support.v7.widget.CardView
                     android:id="@+id/recipe_cook_button"
                     android:layout_width="180dp"
@@ -77,22 +92,21 @@
                         android:text="@string/cook_button_text"
                         android:textColor="@android:color/white"/>
                 </android.support.v7.widget.CardView>
-                    <android.support.design.widget.AppBarLayout
-                        android:layout_marginTop="15dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                <android.support.design.widget.AppBarLayout
+                    android:layout_marginTop="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:elevation="0dp">
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/recipe_tab_layout"
                         android:background="@android:color/transparent"
-                        app:elevation="0dp">
-                        <android.support.design.widget.TabLayout
-                            android:id="@+id/recipe_tab_layout"
-                            android:background="@android:color/transparent"
-                            app:theme="@style/AppTheme.AppBarOverlay"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp" />
-                    </android.support.design.widget.AppBarLayout>
-                </FrameLayout>
+                        app:theme="@style/AppTheme.AppBarOverlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp" />
+                </android.support.design.widget.AppBarLayout>
             </FrameLayout>
-        </com.culinars.culinars.FixedNestedScrollView>
+        </FrameLayout>
     </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>

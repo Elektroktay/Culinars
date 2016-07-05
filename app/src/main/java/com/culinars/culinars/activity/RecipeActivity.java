@@ -1,5 +1,6 @@
 package com.culinars.culinars.activity;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -18,6 +20,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.fragment.recipe.RecipeFactsFragment;
 import com.culinars.culinars.fragment.recipe.RecipeIngredientsFragment;
 import com.culinars.culinars.fragment.recipe.RecipeOthersFragment;
@@ -25,21 +28,26 @@ import com.culinars.culinars.fragment.recipe.SlideshowFragment;
 
 public class RecipeActivity extends AppCompatActivity {
 
+    Recipe currentRecipe;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
+        currentRecipe = (Recipe) getIntent().getSerializableExtra("recipe");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.recipe_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("Cool Recipe");
+        getSupportActionBar().setTitle(currentRecipe.title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         //ViewPager setup
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = (ViewPager) findViewById(R.id.recipe_view_pager);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(pagerAdapter);
         //viewPager.addOnPageChangeListener(new MainPageChangeListener(toolbar));
 
@@ -56,26 +64,30 @@ public class RecipeActivity extends AppCompatActivity {
 
         final FrameLayout buttonSlideContainer = (FrameLayout) findViewById(R.id.button_slide_container);
         final NestedScrollView bottomSheet = (NestedScrollView) findViewById(R.id.recipe_bottom_sheet);
-        bottomSheet.post(new Runnable() {
-            @Override
-            public void run() {
-                bottomSheet.scrollTo(0,0);
-            }
-        });
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.recipe_bottom_sheet_container));
         bottomSheetBehavior.setPeekHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300+70, getResources().getDisplayMetrics()));
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        bottomSheet.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+/*        bottomSheet.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 buttonSlideContainer.setTranslationY(scrollY);
+            }
+        });*/
+
+        CardView cookButton = (CardView) findViewById(R.id.recipe_cook_button);
+        cookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RecipeActivity.this, InstructionsActivity.class);
+                intent.putExtra("recipe", currentRecipe);
+                RecipeActivity.this.startActivity(intent);
             }
         });
     }
 
 
-    private static class PagerAdapter extends FragmentPagerAdapter {
+    private class PagerAdapter extends FragmentPagerAdapter {
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -84,9 +96,9 @@ public class RecipeActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0: return new RecipeIngredientsFragment();
-                case 1: return new RecipeFactsFragment();
-                case 2: return new RecipeOthersFragment();
+                case 0: return RecipeIngredientsFragment.newInstance(currentRecipe) ;
+                case 1: return RecipeFactsFragment.newInstance(currentRecipe);
+                case 2: return RecipeOthersFragment.newInstance(currentRecipe);
             }
             return null;
         }

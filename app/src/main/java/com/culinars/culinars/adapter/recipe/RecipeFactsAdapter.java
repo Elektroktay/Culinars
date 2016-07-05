@@ -13,10 +13,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.data.structure.Recipe;
 
 public class RecipeFactsAdapter extends RecyclerView.Adapter<RecipeFactsAdapter.ViewHolder> {
 
+    private Recipe currentRecipe;
     Context context;
+
+    public RecipeFactsAdapter(Recipe currentRecipe) {
+        this.currentRecipe = currentRecipe;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -40,8 +46,29 @@ public class RecipeFactsAdapter extends RecyclerView.Adapter<RecipeFactsAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (getItemViewType(position) == 0) {
-            holder.facts_title.setText("Calories");
-            holder.facts_amount.setText((position * 100) + " kcal");
+            switch (position) {
+                case 0:
+                    holder.facts_title.setText("Calories per 100g");
+                    holder.facts_amount.setText(currentRecipe.calories + " cal");
+                    break;
+                case 1:
+                    holder.facts_title.setText("Calories per serving");
+                    holder.facts_amount.setText((currentRecipe.calories * 5 / 2) + " cal");
+                    break;
+                case 2:
+                    holder.facts_title.setText("Fat per 100g");
+                    holder.facts_amount.setText((currentRecipe.fat) + " mg");
+                    break;
+                case 3:
+                    holder.facts_title.setText("Fat per serving");
+                    holder.facts_amount.setText((currentRecipe.calories * 5 / 2) + " mg");
+                    break;
+                default:
+                    holder.facts_title.setText("Geriye ne yazicaz");
+                    holder.facts_amount.setText("amk");
+                    break;
+            }
+
             if (position % 2 == 0) {
                 holder.facts_card.setBackgroundColor(Color.TRANSPARENT);
             } else {

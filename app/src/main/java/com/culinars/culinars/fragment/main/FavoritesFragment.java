@@ -1,5 +1,6 @@
 package com.culinars.culinars.fragment.main;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +13,9 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 import com.culinars.culinars.R;
+import com.culinars.culinars.activity.MainActivity;
 import com.culinars.culinars.adapter.main.FavoritesAdapter;
+import com.culinars.culinars.adapter.main.FavoritesAdapter2;
 
 /**
  * Created by Oktayşen on 21/6/2016.
@@ -23,6 +26,8 @@ public class FavoritesFragment extends Fragment {
      * fragment.
      */
     private Toolbar toolbar;
+    public RecyclerView recyclerView;
+    private MainActivity activity;
 
     public FavoritesFragment() {
     }
@@ -31,9 +36,10 @@ public class FavoritesFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FavoritesFragment newInstance(Toolbar toolbar) {
+    public static FavoritesFragment newInstance(Toolbar toolbar, MainActivity activity) {
         FavoritesFragment fragment = new FavoritesFragment();
         fragment.toolbar = toolbar;
+        fragment.activity = activity;
         return fragment;
     }
 
@@ -43,23 +49,23 @@ public class FavoritesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_favorites, container, false);
         //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
         //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.favorite_recycler_view);
-        //recyclerView.setHasFixedSize(true);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.favorite_recycler_view);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
-        recyclerView.setAdapter(new FavoritesAdapter());
+        setAdapter(new FavoritesAdapter(this));
         return rootView;
     }
 
-    //Src: https://mzgreen.github.io/2015/02/15/How-to-hideshow-Toolbar-when-list-is-scroling(part1)/
-    private void hideViews() {
-        if (toolbar != null) {
-            toolbar.animate().translationY(-(int) (toolbar.getHeight() * 1.2)).setInterpolator(new AccelerateInterpolator(2)).start();
-        }
-    }
-
-    private void showViews() {
-        if (toolbar != null) {
-            toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        }
+    public void setAdapter(RecyclerView.Adapter adapter) {
+        recyclerView.setAdapter(adapter);
+        if (adapter instanceof FavoritesAdapter2)
+            activity.setBackButtonAction(new Runnable() {
+                @Override
+                public void run() {
+                    setAdapter(new FavoritesAdapter(FavoritesFragment.this));
+                }
+            });
+        else
+            activity.setBackButtonAction(null);
     }
 }

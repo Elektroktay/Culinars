@@ -6,8 +6,8 @@
 
     <item
         android:title="Login"
-        />
+        android:id="@+id/user_login"/>
     <item
         android:title="Register"
-        />
+        android:id="@+id/user_register"/>
 </menu>

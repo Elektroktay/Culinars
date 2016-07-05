@@ -1,6 +1,8 @@
 package com.culinars.culinars;
 
 
+import com.google.firebase.FirebaseApp;
+
 /**
  * Created by Oktayşen on 14/6/2016.
  */
