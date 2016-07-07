@@ -9,6 +9,9 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Content implements Data{
 
+    public static final int TYPE_IMAGE = 0;
+    public static final int TYPE_VIDEO = 1;
+
     public String uid, url;
     public int type;
 

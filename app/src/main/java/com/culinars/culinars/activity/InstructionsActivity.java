@@ -55,7 +55,7 @@ public class InstructionsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Cool Recipe");
+        getSupportActionBar().setTitle(currentRecipe.title);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -99,9 +99,12 @@ public class InstructionsActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_settings:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -128,8 +131,8 @@ public class InstructionsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            if (currentRecipe.instructions != null)
-                return currentRecipe.instructions.size();
+            if (instructions != null)
+                return instructions.getValues().size();
             else
                 return 0;
         }

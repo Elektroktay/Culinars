@@ -58,14 +58,16 @@ public class FavoritesFragment extends Fragment {
 
     public void setAdapter(RecyclerView.Adapter adapter) {
         recyclerView.setAdapter(adapter);
-        if (adapter instanceof FavoritesAdapter2)
-            activity.setBackButtonAction(new Runnable() {
-                @Override
-                public void run() {
-                    setAdapter(new FavoritesAdapter(FavoritesFragment.this));
-                }
-            });
-        else
-            activity.setBackButtonAction(null);
+        if (activity != null) {
+            if (adapter instanceof FavoritesAdapter2)
+                activity.setBackButtonAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        setAdapter(new FavoritesAdapter(FavoritesFragment.this));
+                    }
+                });
+            else
+                activity.setBackButtonAction(null);
+        }
     }
 }

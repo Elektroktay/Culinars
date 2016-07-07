@@ -10,7 +10,11 @@
         android:id="@+id/instructions_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginBottom="32dp"
         app:cardBackgroundColor="@color/colorTabBackground"
         app:cardElevation="5dp"
         app:cardCornerRadius="5dp">
@@ -31,7 +35,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
-                <!--Put media here-->
+                <com.culinars.culinars.SquareFrameLayout
+                    android:layout_width="170dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom">
+                    <!--Put media here-->
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/instructions_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:riv_oval="true"
+                        app:riv_border_width="5dp"
+                        app:riv_border_color="#33FFFFFF"
+                        android:src="@drawable/kaan"
+                        android:scaleType="centerCrop"/>
+                    <ProgressBar
+                        android:id="@+id/instructions_loading"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:indeterminateOnly="true"
+                        android:indeterminate="true"
+                        android:layout_gravity="center"/>
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/instructions_timer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.culinars.culinars.SquareFrameLayout>
+
             </FrameLayout>
             <FrameLayout
                 android:layout_width="match_parent"

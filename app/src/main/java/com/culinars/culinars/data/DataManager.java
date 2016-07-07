@@ -1,6 +1,8 @@
 package com.culinars.culinars.data;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,6 +17,8 @@ import com.culinars.culinars.data.structure.Instruction;
 import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.data.structure.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
@@ -26,7 +30,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -40,7 +49,7 @@ public class DataManager {
     public static final String RECOMMENDATIONS = "suggestions";
     public static final String SIMILAR_RECIPES = "similar_recipes";
     public static final String INSTRUCTIONS = "instructions";
-    public static final String CONTENT = "content";
+    public static final String CONTENT = "contents";
 
     public static final String FAVORITES = "favorites";
 
@@ -50,11 +59,13 @@ public class DataManager {
     private FirebaseApp firebase;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
+    private FirebaseStorage storage;
     private Activity activity;
 
     private DataManager() {
         firebase = FirebaseApp.getInstance();
         auth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
         database = FirebaseDatabase.getInstance();
         database.setPersistenceEnabled(false);
     }
@@ -147,6 +158,11 @@ public class DataManager {
     public ReferenceMultipleFromKeys<Instruction> getInstructions(String recipeId) {
         DatabaseReference ref = database.getReference(RECIPES).child(recipeId).child(INSTRUCTIONS);
         return new ReferenceMultipleFromKeys<>(ref, INSTRUCTIONS, Instruction.class);
+    }
+
+    public ReferenceMultipleFromKeys<Content> getRecipeContent(String recipeId) {
+        DatabaseReference ref = database.getReference(RECIPES).child(recipeId).child(CONTENT);
+        return new ReferenceMultipleFromKeys<>(ref, CONTENT, Content.class);
     }
 
     /*
@@ -380,5 +396,40 @@ public class DataManager {
             }
         });
         return result;
+    }
+
+    public void downloadContent(final Content content, final OnDownloadFinishedListener listener, Activity currentActivity) {
+        try {
+            if (content != null && content.url != null && content.url.length() > 0) {
+                if (content.type != Content.TYPE_VIDEO) {
+                    StorageReference ref = storage.getReferenceFromUrl(content.url);
+                    final File tempFile = File.createTempFile(content.uid, "cdownload");
+                    ref.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            if (content.type == Content.TYPE_IMAGE)
+                                listener.onDownloadFinished(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            listener.onDownloadFailed(e);
+                        }
+                    });
+                } else {
+                    listener.onDownloadFinished(content.url);
+                }
+            } else {
+                listener.onDownloadFailed(new Exception("Content cannot be null."));
+            }
+        } catch (Exception e) {
+            Log.w("DOWNLOAD_IMG", "Download failed!", e);
+            listener.onDownloadFailed(e);
+        }
+    }
+
+    public interface OnDownloadFinishedListener {
+        void onDownloadFinished(Object result);
+        void onDownloadFailed(Exception e);
     }
 }

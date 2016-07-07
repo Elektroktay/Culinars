@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@android:color/darker_gray">
     <ImageView
         android:id="@+id/slideshow_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/cooking_prep3"
         android:scaleType="centerCrop"/>
+    <ProgressBar
+        android:id="@+id/slideshow_loading"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:indeterminateOnly="true"
+        android:indeterminate="true"
+        android:layout_gravity="center"/>
 </FrameLayout>

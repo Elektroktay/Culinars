@@ -20,7 +20,7 @@ import java.util.Map;
 public class Recipe implements Serializable, Data{
     public String uid, title, owner_id, description, cuisine;
     public int difficulty_scale, time, calories, fat;
-    public Map<String, Boolean> instructions;
+    public Map<String, Boolean> instructions, content;
     public Map<String, Integer> ingredients, comments;
 
     public Recipe() {
@@ -31,7 +31,8 @@ public class Recipe implements Serializable, Data{
                   int difficulty_scale, int time, int calories, int fat,
                   Map<String, Boolean> instructions,
                   Map<String, Integer> ingredients,
-                  Map<String, Integer> comments ) {
+                  Map<String, Integer> comments,
+                  Map<String, Boolean> content) {
         this.uid = uid;
         this.title = title;
         this.owner_id = owner_id;
@@ -46,6 +47,7 @@ public class Recipe implements Serializable, Data{
         this.instructions = instructions;
         this.ingredients = ingredients;
         this.comments = comments;
+        this.content = content;
     }
 
     @Exclude
@@ -78,6 +80,7 @@ public class Recipe implements Serializable, Data{
         result.put("instructions", instructions);
         result.put("ingredients", ingredients);
         result.put("comments", comments);
+        result.put("content", content);
 
         return result;
     }

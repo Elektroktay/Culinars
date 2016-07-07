@@ -44,7 +44,8 @@ public class Reference<T extends Data> {
                     Log.e("REFERENCE_FAIL", dataClass.toString(), e);
                     return;
                 }
-                value.setUid(dataSnapshot.getKey());
+                if (value != null)
+                    value.setUid(dataSnapshot.getKey());
                 for (OnDataReadyListener<T> listener : listeners) {
                     listener.onDataReady(value);
                 }

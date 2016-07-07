@@ -48,10 +48,12 @@ public class ReferenceMultipleFromKeys<T extends Data> {
                     reference.addOnDataReadyListener(new Reference.OnDataReadyListener<T>() {
                         @Override
                         public void onDataReady(T value) {
-                            values.add(value);
+                            if (value != null) {
+                                values.add(value);
 
-                            for (OnDataChangeListener listener : listeners) {
-                                listener.onDataChange(value, event);
+                                for (OnDataChangeListener listener : listeners) {
+                                    listener.onDataChange(value, event);
+                                }
                             }
                         }
                     });

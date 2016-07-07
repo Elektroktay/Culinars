@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -386,15 +387,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateSearchParams() {
-        if (mViewPager.getCurrentItem() < 2)
-            recommendationsFragment.searchWith(
-                    searchQuery,
-                    searchMaxTime,
-                    searchMaxCalories,
-                    searchIngredients,
-                    searchCuisine,
-                    searchOnlyCurrentIngredients);
-        else
+        if (mViewPager.getCurrentItem() < 2) {
+            if (recommendationsFragment != null)
+                recommendationsFragment.searchWith(
+                        searchQuery,
+                        searchMaxTime,
+                        searchMaxCalories,
+                        searchIngredients,
+                        searchCuisine,
+                        searchOnlyCurrentIngredients);
+        } else
             fridgeFragment.searchWith(searchQuery);
     }
 

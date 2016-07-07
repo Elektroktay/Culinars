@@ -15,6 +15,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
@@ -30,12 +31,15 @@ public class RecipeActivity extends AppCompatActivity {
 
     Recipe currentRecipe;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
-        currentRecipe = (Recipe) getIntent().getSerializableExtra("recipe");
+        if (currentRecipe == null)
+            currentRecipe = (Recipe) getIntent().getSerializableExtra("recipe");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.recipe_toolbar);
         setSupportActionBar(toolbar);
@@ -51,7 +55,7 @@ public class RecipeActivity extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         //viewPager.addOnPageChangeListener(new MainPageChangeListener(toolbar));
 
-        SlideshowFragment.PagerAdapter slideshowAdapter = new SlideshowFragment.PagerAdapter(getSupportFragmentManager());
+        SlideshowFragment.PagerAdapter slideshowAdapter = new SlideshowFragment.PagerAdapter(getSupportFragmentManager(), currentRecipe);
         ViewPager slideshowPager = (ViewPager) findViewById(R.id.recipe_image_container);
         slideshowPager.setAdapter(slideshowAdapter);
 
@@ -117,5 +121,15 @@ public class RecipeActivity extends AppCompatActivity {
             }
             return super.getPageTitle(position);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

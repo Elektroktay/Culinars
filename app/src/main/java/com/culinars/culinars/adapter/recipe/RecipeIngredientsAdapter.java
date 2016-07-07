@@ -3,14 +3,17 @@ package com.culinars.culinars.adapter.recipe;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
@@ -83,7 +86,9 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
                 holder.ingredients_card.setBackgroundColor(Color.parseColor("#1AFFFFFF"));
             }
         } else if (getItemViewType(position) == 1) {
-
+            String[] servings = new String[]{"01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+                    "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
+            holder.servings.setAdapter(new ArrayAdapter<>(context, R.layout.fragment_servings_spinner, servings));
         }
         //holder.ingredients_checkbox.setChecked(position%2==0);
     }
@@ -103,6 +108,8 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
         AppCompatCheckBox ingredients_checkbox;
         FrameLayout ingredients_container;
 
+        AppCompatSpinner servings;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ingredients_card = (CardView) itemView.findViewById(R.id.recipe_ingredients_card);
@@ -111,6 +118,8 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             ingredients_amount = (TextView) itemView.findViewById(R.id.recipe_ingredients_amount);
             ingredients_checkbox = (AppCompatCheckBox) itemView.findViewById(R.id.recipe_ingredients_checkbox);
             ingredients_container = (FrameLayout) itemView.findViewById(R.id.recipe_ingredients_container);
+
+            servings = (AppCompatSpinner) itemView.findViewById(R.id.recipe_ingredients_servings);
         }
     }
 }
