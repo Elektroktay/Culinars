@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginLeft="45dp"
-    android:layout_marginStart="45dp"
-    android:layout_marginEnd="45dp"
-    android:layout_marginRight="45dp"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="20dp"
-    android:weightSum="2"
     android:orientation="horizontal"
     android:id="@+id/recipe_ingredients_button_container"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:id="@+id/recipe_ingredients_buy_button">
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -32,6 +28,7 @@
             android:layout_marginBottom="4dp"/>
     </FrameLayout>
     <View
+        android:id="@+id/recipe_ingredients_button_bar_1"
         android:layout_width="1dp"
         android:layout_height="match_parent"
         android:layout_marginTop="12dp"
@@ -41,7 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
-        <android.support.v7.widget.AppCompatSpinner
+<!--        <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/recipe_ingredients_servings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -51,7 +48,40 @@
             android:layout_marginTop="4dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:popupBackground="@color/colorTabBackground"/>
+            android:popupBackground="@color/colorTabBackground"/>-->
+
+
+<!--        <cn.carbswang.android.numberpickerview.library.NumberPickerView
+            android:id="@+id/recipe_ingredients_servings_old"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal|top"
+            android:theme="@style/AppTheme.Picker"
+            android:backgroundTint="@android:color/transparent"
+            android:solidColor="@android:color/transparent"
+            android:divider="@android:color/transparent"
+            android:showDividers="none"
+            android:layout_marginTop="4dp"/>-->
+
+
+        <cn.carbswang.android.numberpickerview.library.NumberPickerView
+            android:id="@+id/recipe_ingredients_servings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:npv_ItemPaddingHorizental="5dp"
+            app:npv_TextColorNormal="@android:color/white"
+            app:npv_TextColorSelected="@android:color/white"
+            android:layout_gravity="center_horizontal|top"
+
+            app:npv_ShowCount="1"
+            app:npv_MinValue="1"
+            app:npv_MaxValue="20"
+            app:npv_ShowDivider="false"
+            app:npv_TextSizeNormal="40sp"
+            app:npv_TextSizeSelected="40sp"
+            app:npv_WrapSelectorWheel="false"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,4 +92,31 @@
             />
     </FrameLayout>
 
+    <View
+        android:id="@+id/recipe_ingredients_button_bar_2"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@android:color/white" />
+
+    <FrameLayout
+        android:id="@+id/recipe_ingredients_fridge_button"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:layout_weight="1">
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/check_white"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add to Fridge"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="4dp"/>
+    </FrameLayout>
 </LinearLayout>

@@ -186,7 +186,8 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/card_image_container">
+                android:id="@+id/card_image_container"
+                android:background="@android:color/darker_gray">
                 <ImageView
                     android:id="@+id/card_image"
                     android:layout_width="match_parent"
@@ -199,6 +200,13 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:background="@drawable/gradient_black"/>
+                <ProgressBar
+                    android:id="@+id/recommendations_loading"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:indeterminateOnly="true"
+                    android:indeterminate="true"
+                    android:layout_gravity="center"/>
             </FrameLayout>
             <RelativeLayout
                 android:id="@+id/star_container"

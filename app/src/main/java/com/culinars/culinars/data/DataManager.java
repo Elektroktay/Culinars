@@ -3,6 +3,7 @@ package com.culinars.culinars.data;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -36,6 +37,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -157,7 +159,8 @@ public class DataManager {
 
     public ReferenceMultipleFromKeys<Instruction> getInstructions(String recipeId) {
         DatabaseReference ref = database.getReference(RECIPES).child(recipeId).child(INSTRUCTIONS);
-        return new ReferenceMultipleFromKeys<>(ref, INSTRUCTIONS, Instruction.class);
+        Query query = ref.orderByChild("position");
+        return new ReferenceMultipleFromKeys<>(query, INSTRUCTIONS, Instruction.class);
     }
 
     public ReferenceMultipleFromKeys<Content> getRecipeContent(String recipeId) {
@@ -191,11 +194,11 @@ public class DataManager {
             ref.removeValue();
     }
 
-    public void setIngredient(String ingredient, boolean exists) {
-        setIngredient(getCurrentUser().getUid(), ingredient, exists);
+    public void setIngredient(String ingredient, boolean exists, OnDataChangeListener<Ingredient> listener) {
+        setIngredient(getCurrentUser().getUid(), ingredient, exists, listener);
     }
 
-    public void setIngredient(String userId, String ingredient, boolean exists) {
+    public void setIngredient(String userId, String ingredient, boolean exists, final OnDataChangeListener<Ingredient> listener) {
         if (ingredient == null) {
             ingredient = "";
         }
@@ -204,9 +207,21 @@ public class DataManager {
         }
         DatabaseReference ref = database.getReference(USERS).child(userId).child(INGREDIENTS).child(ingredient);
         if (exists)
-            ref.setValue(true);
+            ref.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    if (listener != null)
+                        listener.onDataChange(null, 0);
+                }
+            });
         else
-            ref.removeValue();
+            ref.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    if (listener != null)
+                        listener.onDataChange(null, 0);
+                }
+            });;
     }
 
     public String putInstruction(Instruction instruction) {
@@ -321,22 +336,22 @@ public class DataManager {
         auth.addAuthStateListener(getAuthStateListener(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity, "LOGGED IN: " + getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(activity, "LOGGED IN: " + getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
                 addNewUser(getCurrentUser().getUid());
             }
         }, new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity, "LOGGED OUT", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(activity, "LOGGED OUT", Toast.LENGTH_SHORT).show();
                 auth.signInAnonymously()
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isComplete()) {
-                            Toast.makeText(activity, "ANONYMOUS LOGIN FAILURE", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(activity, "ANONYMOUS LOGIN FAILURE", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        Toast.makeText(activity, "ANONYMOUS LOGIN SUCCESS", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(activity, "ANONYMOUS LOGIN SUCCESS", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -355,7 +370,8 @@ public class DataManager {
         }
     }
 
-    public ReferenceMultiple<Recipe> searchRecipes(String searchQuery, final int searchMaxTime, final int searchMaxCalories, final ArrayList<String> searchIngredients, final String searchCuisine, boolean searchOnlyCurrentIngredients, int resultCount) {
+    public ReferenceMultiple<Recipe> searchRecipes(String searchQuery, final int searchMaxTime, final int searchMaxCalories, final ArrayList<String> searchIngredients, final String searchCuisine, boolean searchOnlyCurrentIngredients, int resultCount,
+                                                   final OnDataChangeListener<Recipe> listener) {
         DatabaseReference ref = database.getReference(RECIPES);
         Query query = ref.limitToLast(100);
         if (searchQuery != null && searchQuery.length() > 0) {
@@ -364,16 +380,20 @@ public class DataManager {
             query = query.endAt(searchQuery + "zzzzzzzzzzzz");
         }
         final ReferenceMultiple<Recipe> result = new ReferenceMultiple<>(query, Recipe.class);
-        result.addOnDataChangeListener(new ReferenceMultiple.OnDataChangeListener<Recipe>() {
+        result.addOnDataChangeListener(new OnDataChangeListener<Recipe>() {
             @Override
             public void onDataChange(Recipe newValue, int event) {
                 //Filter time
-                if (searchMaxTime > -1 && newValue.time > searchMaxTime)
+                if (searchMaxTime > -1 && newValue.time > searchMaxTime) {
                     result.getValues().remove(newValue);
+                    return;
+                }
 
                 //Filter calories
-                if (searchMaxCalories > -1 && newValue.calories > searchMaxCalories)
+                if (searchMaxCalories > -1 && newValue.calories > searchMaxCalories) {
                     result.getValues().remove(newValue);
+                    return;
+                }
 
                 //Filter Ingredients
                 if (searchIngredients != null && searchIngredients.size() > 0) {
@@ -381,7 +401,7 @@ public class DataManager {
                         if (newValue.ingredients != null) {
                             if (!newValue.ingredients.containsKey(i)) {
                                 result.getValues().remove(newValue);
-                                break;
+                                return;
                             }
                         }
                     }
@@ -389,26 +409,36 @@ public class DataManager {
 
                 //Filter cuisine
                 if (searchCuisine != null && searchCuisine.length() > 0
-                        && !newValue.cuisine.equalsIgnoreCase(searchCuisine))
+                        && (newValue.cuisine == null || !newValue.cuisine.equalsIgnoreCase(searchCuisine))) {
                     result.getValues().remove(newValue);
+                    return;
+                }
 
                 //TODO: Filter only current
+
+                listener.onDataChange(newValue, event);
             }
         });
         return result;
     }
 
-    public void downloadContent(final Content content, final OnDownloadFinishedListener listener, Activity currentActivity) {
+    public void downloadContent(final Content content, final OnDownloadFinishedListener listener) {
         try {
             if (content != null && content.url != null && content.url.length() > 0) {
                 if (content.type != Content.TYPE_VIDEO) {
                     StorageReference ref = storage.getReferenceFromUrl(content.url);
-                    final File tempFile = File.createTempFile(content.uid, "cdownload");
-                    ref.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    //final File tempFile = File.createTempFile(content.uid, "cdownload");
+                    ref.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            if (content.type == Content.TYPE_IMAGE)
-                                listener.onDownloadFinished(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap result = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            if (result == null || result.getByteCount() < 100) {
+                                Log.w("FUCK", "ME");
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inSampleSize = 5;
+                                result = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                            }
+                            listener.onDownloadFinished(result);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -416,6 +446,21 @@ public class DataManager {
                             listener.onDownloadFailed(e);
                         }
                     });
+/*                    ref.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            if (content.type == Content.TYPE_IMAGE) {
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inSampleSize = 2;
+                                listener.onDownloadFinished(BitmapFactory.decodeFile(tempFile.getAbsolutePath(), options));
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            listener.onDownloadFailed(e);
+                        }
+                    });*/
                 } else {
                     listener.onDownloadFinished(content.url);
                 }

@@ -39,46 +39,47 @@ public class ReferenceMultipleFromKeys<T extends Data> {
         //query.addChildEventListener(getChildEventListener(dataClass));
     }
 
-    private ReferenceKeys.OnDataChangeListener getOnDataChangeListener(final String parentPath, final Class<T> dataClass) {
-        return new ReferenceKeys.OnDataChangeListener() {
+    private OnDataChangeListener<String> getOnDataChangeListener(final String parentPath, final Class<T> dataClass) {
+        return new OnDataChangeListener<String>() {
+
             @Override
             public void onDataChange(String newValue, final int event) {
                 if (event == ReferenceKeys.DATA_ADDED) {
                     Reference<T> reference = DataManager.getInstance().getSingleData(parentPath, newValue, dataClass);
-                    reference.addOnDataReadyListener(new Reference.OnDataReadyListener<T>() {
+                    reference.addOnDataReadyListener(new OnDataChangeListener<T>() {
                         @Override
-                        public void onDataReady(T value) {
-                            if (value != null) {
-                                values.add(value);
+                        public void onDataChange(T newValue, int event) {
+                            if (newValue != null) {
+                                values.add(newValue);
 
                                 for (OnDataChangeListener listener : listeners) {
-                                    listener.onDataChange(value, event);
+                                    listener.onDataChange(newValue, event);
                                 }
                             }
                         }
                     });
                 } else if (event == ReferenceKeys.DATA_CHANGED) {
                     Reference<T> reference = DataManager.getInstance().getSingleData(parentPath, newValue, dataClass);
-                    reference.addOnDataReadyListener(new Reference.OnDataReadyListener<T>() {
+                    reference.addOnDataReadyListener(new OnDataChangeListener<T>() {
                         @Override
-                        public void onDataReady(T value) {
-                            if (values.indexOf(value) > -1)
-                                values.set(values.indexOf(value), value);
+                        public void onDataChange(T newValue, int event) {
+                            if (values.indexOf(newValue) > -1)
+                                values.set(values.indexOf(newValue), newValue);
 
                             for (OnDataChangeListener listener : listeners) {
-                                listener.onDataChange(value, event);
+                                listener.onDataChange(newValue, event);
                             }
                         }
                     });
                 } else if(event == ReferenceKeys.DATA_REMOVED) {
                     Reference<T> reference = DataManager.getInstance().getSingleData(parentPath, newValue, dataClass);
-                    reference.addOnDataReadyListener(new Reference.OnDataReadyListener<T>() {
+                    reference.addOnDataReadyListener(new OnDataChangeListener<T>() {
                         @Override
-                        public void onDataReady(T value) {
-                            values.remove(value);
+                        public void onDataChange(T newValue, int event) {
+                            values.remove(newValue);
 
                             for (OnDataChangeListener listener : listeners) {
-                                listener.onDataChange(value, event);
+                                listener.onDataChange(newValue, event);
                             }
                         }
                     });
@@ -101,9 +102,5 @@ public class ReferenceMultipleFromKeys<T extends Data> {
 
     public void removeOnDataChangeListener(OnDataChangeListener<T> listener) {
         listeners.remove(listener);
-    }
-
-    public interface OnDataChangeListener<T> {
-        void onDataChange(T newValue, int event);
     }
 }

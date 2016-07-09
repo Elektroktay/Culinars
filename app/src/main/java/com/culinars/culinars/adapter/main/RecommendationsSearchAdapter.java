@@ -2,6 +2,7 @@ package com.culinars.culinars.adapter.main;
 
 
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.ReferenceMultiple;
 import com.culinars.culinars.data.ReferenceMultipleFromKeys;
 import com.culinars.culinars.data.structure.Recipe;
@@ -39,13 +40,22 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
     }
 
     public RecommendationsSearchAdapter(int initResultCount) {
+        super(initResultCount);
         resultCount = initResultCount;
         updateSearchParams("", -1, -1, new ArrayList<String>(), "", false);
     }
 
     @Override
     public Recipe getDataAtPos(int position) {
-        return data.getValueAt(position);
+        if (data != null)
+            return data.getValueAt(position);
+        else
+            return null;
+    }
+
+    @Override
+    public int getPositionOfRecipe(Recipe recipe) {
+        return data.getValues().indexOf(recipe);
     }
 
     @Override
@@ -57,13 +67,8 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
                 searchIngredients,
                 searchCuisine,
                 searchOnlyCurrentIngredients,
-                resultCount);
-        data.addOnDataChangeListener(new ReferenceMultiple.OnDataChangeListener<Recipe>() {
-            @Override
-            public void onDataChange(Recipe newValue, int event) {
-                RecommendationsSearchAdapter.this.notifyDataSetChanged();
-            }
-        });
+                resultCount,
+                getListener());
     }
 
     @Override

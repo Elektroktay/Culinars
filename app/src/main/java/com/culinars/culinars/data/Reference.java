@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class Reference<T extends Data> {
 
     private T value;
-    private ArrayList<OnDataReadyListener<T>> listeners;
+    private ArrayList<OnDataChangeListener<T>> listeners;
 
     public Reference(final DatabaseReference ref, final Class<T> dataClass) {
         listeners = new ArrayList<>();
@@ -46,8 +46,8 @@ public class Reference<T extends Data> {
                 }
                 if (value != null)
                     value.setUid(dataSnapshot.getKey());
-                for (OnDataReadyListener<T> listener : listeners) {
-                    listener.onDataReady(value);
+                for (OnDataChangeListener<T> listener : listeners) {
+                    listener.onDataChange(value, 0);
                 }
             }
 
@@ -62,15 +62,11 @@ public class Reference<T extends Data> {
         return value;
     }
 
-    public void addOnDataReadyListener(OnDataReadyListener<T> listener) {
+    public void addOnDataReadyListener(OnDataChangeListener<T> listener) {
         listeners.add(listener);
     }
 
-    public void removeOnDataReadyListener(OnDataReadyListener<T> listener) {
+    public void removeOnDataReadyListener(OnDataChangeListener<T> listener) {
         listeners.remove(listener);
-    }
-
-    public interface OnDataReadyListener<T> {
-        void onDataReady(T value);
     }
 }

@@ -19,18 +19,19 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Recipe implements Serializable, Data{
     public String uid, title, owner_id, description, cuisine;
-    public int difficulty_scale, time, calories, fat;
+    public int difficulty_scale, time, calories, fat, serves;
     public Map<String, Boolean> instructions, content;
-    public Map<String, Integer> ingredients, comments;
+    public Map<String, Integer> comments;
+    public Map<String, String> ingredients;
 
     public Recipe() {
 
     }
 
     public Recipe(String uid, String title, String owner_id, String description, String cuisine,
-                  int difficulty_scale, int time, int calories, int fat,
+                  int difficulty_scale, int time, int calories, int fat, int serves,
                   Map<String, Boolean> instructions,
-                  Map<String, Integer> ingredients,
+                  Map<String, String> ingredients,
                   Map<String, Integer> comments,
                   Map<String, Boolean> content) {
         this.uid = uid;
@@ -43,6 +44,7 @@ public class Recipe implements Serializable, Data{
         this.time = time;
         this.calories = calories;
         this.fat = fat;
+        this.serves = serves;
 
         this.instructions = instructions;
         this.ingredients = ingredients;
@@ -76,6 +78,7 @@ public class Recipe implements Serializable, Data{
         result.put("time", time);
         result.put("calories", calories);
         result.put("fat", fat);
+        result.put("serves", serves);
 
         result.put("instructions", instructions);
         result.put("ingredients", ingredients);

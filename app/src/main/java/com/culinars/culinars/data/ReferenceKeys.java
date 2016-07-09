@@ -91,8 +91,4 @@ public class ReferenceKeys {
     public void removeOnDataChangeListener(OnDataChangeListener listener) {
         listeners.remove(listener);
     }
-
-    public interface OnDataChangeListener {
-        void onDataChange(String newValue, int event);
-    }
 }

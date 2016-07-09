@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class RecommendationsFragment extends Fragment {
         RecommendationsFragment fragment = new RecommendationsFragment();
         fragment.isSearching = false;
         fragment.toolbar = toolbar;
-        fragment.adapter = new RecommendationsAdapter();
+        fragment.adapter = new RecommendationsSearchAdapter();
         return fragment;
     }
 
@@ -58,11 +59,19 @@ public class RecommendationsFragment extends Fragment {
 
     public void setSearching(boolean isSearching) {
         if (this.isSearching != isSearching) {
+/*            adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
             if (isSearching)
                 adapter = new RecommendationsSearchAdapter();
             else
                 adapter = new RecommendationsAdapter();
-            recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(null);
+            recyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setAdapter(adapter);
+                    Log.w("SET_ADAPTER", "...");
+                }
+            }, 100);*/
             this.isSearching = isSearching;
         }
     }

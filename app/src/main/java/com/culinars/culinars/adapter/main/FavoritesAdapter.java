@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.ReferenceMultipleFromKeys;
 import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.fragment.main.FavoritesFragment;
@@ -28,7 +29,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
     private void refreshData() {
         data = DataManager.getInstance().getFavorites();
-        data.addOnDataChangeListener(new ReferenceMultipleFromKeys.OnDataChangeListener<Recipe>() {
+        data.addOnDataChangeListener(new OnDataChangeListener<Recipe>() {
 
             @Override
             public void onDataChange(Recipe newValue, int event) {

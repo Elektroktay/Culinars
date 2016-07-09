@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.ReferenceMultiple;
 import com.culinars.culinars.data.structure.Ingredient;
 
@@ -37,7 +38,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
 
     public void refreshData(String completionText) {
         data = DataManager.getInstance().findIngredient(completionText, dataLimit);
-        data.addOnDataChangeListener(new ReferenceMultiple.OnDataChangeListener<Ingredient>() {
+        data.addOnDataChangeListener(new OnDataChangeListener<Ingredient>() {
             @Override
             public void onDataChange(Ingredient newValue, int event) {
                 notifyDataSetChanged();
@@ -46,7 +47,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         if (DataManager.getInstance().hasIngredient(data.getValueAt(position).name))
             holder.fridge_check.setImageResource(R.drawable.check_green);
         else
@@ -57,12 +58,20 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         holder.fridge_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (DataManager.getInstance().hasIngredient(data.getValueAt(position).name)) {
-                    DataManager.getInstance().setIngredient(data.getValueAt(position).name, false);
-                    holder.fridge_check.setImageResource(R.drawable.check_white);
+                if (DataManager.getInstance().hasIngredient(data.getValueAt(holder.getAdapterPosition()).name)) {
+                    DataManager.getInstance().setIngredient(data.getValueAt(holder.getAdapterPosition()).name, false, new OnDataChangeListener<Ingredient>() {
+                        @Override
+                        public void onDataChange(Ingredient newValue, int event) {
+                            notifyItemChanged(holder.getAdapterPosition());
+                        }
+                    });
                 } else {
-                    DataManager.getInstance().setIngredient(data.getValueAt(position).name, true);
-                    holder.fridge_check.setImageResource(R.drawable.check_green);
+                    DataManager.getInstance().setIngredient(data.getValueAt(holder.getAdapterPosition()).name, true, new OnDataChangeListener<Ingredient>() {
+                        @Override
+                        public void onDataChange(Ingredient newValue, int event) {
+                            notifyItemChanged(holder.getAdapterPosition());
+                        }
+                    });
                 }
             }
         });

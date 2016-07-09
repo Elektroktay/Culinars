@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.ReferenceMultipleFromKeys;
 import com.culinars.culinars.data.structure.Instruction;
 import com.culinars.culinars.data.structure.Recipe;
@@ -61,7 +62,7 @@ public class InstructionsActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         instructions = DataManager.getInstance().getInstructions(currentRecipe.uid);
-        instructions.addOnDataChangeListener(new ReferenceMultipleFromKeys.OnDataChangeListener<Instruction>() {
+        instructions.addOnDataChangeListener(new OnDataChangeListener<Instruction>() {
             @Override
             public void onDataChange(Instruction newValue, int event) {
                 mSectionsPagerAdapter.notifyDataSetChanged();

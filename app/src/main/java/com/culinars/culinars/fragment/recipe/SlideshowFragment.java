@@ -18,15 +18,14 @@ import android.widget.ProgressBar;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.Reference;
 import com.culinars.culinars.data.ReferenceMultipleFromKeys;
 import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Data;
 import com.culinars.culinars.data.structure.Recipe;
 
-/**
- * Created by Oktayşen on 23/6/2016.
- */
+
 public class SlideshowFragment extends Fragment {
 
     private Content currentContent;
@@ -82,8 +81,9 @@ public class SlideshowFragment extends Fragment {
                         fragment.setLoadingEnabled(false);
                         fragment.videoUrl = (String) result;
                     }
-                    fragment.getFragmentManager().beginTransaction()
-                            .detach(fragment).attach(fragment).commit(); //Refreshes fragment.
+                    if (fragment.getFragmentManager() != null)
+                        fragment.getFragmentManager().beginTransaction()
+                                .detach(fragment).attach(fragment).commit(); //Refreshes fragment.
                 }
 
                 @Override
@@ -91,7 +91,7 @@ public class SlideshowFragment extends Fragment {
                     Log.w("DOWNLOAD", "Download failed.", e);
                     fragment.setLoadingEnabled(false);
                 }
-            }, fragment.getActivity());
+            });
         } else {
             Log.w("WTF", "WTF");
         }
@@ -114,7 +114,7 @@ public class SlideshowFragment extends Fragment {
         public PagerAdapter(FragmentManager fm, Recipe currentRecipe) {
             super(fm);
             data = DataManager.getInstance().getRecipeContent(currentRecipe.uid);
-            data.addOnDataChangeListener(new ReferenceMultipleFromKeys.OnDataChangeListener<Content>() {
+            data.addOnDataChangeListener(new OnDataChangeListener<Content>() {
                 @Override
                 public void onDataChange(Content newValue, int event) {
                     Log.w("DATA_REC", "DATA_RECEIVED:" + newValue.url);

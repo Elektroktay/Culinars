@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.culinars.culinars.R;
 import com.culinars.culinars.Timer;
 import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.OnDataChangeListener;
 import com.culinars.culinars.data.Reference;
 import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Instruction;
@@ -62,12 +63,12 @@ public class InstructionsFragment extends Fragment {
         final InstructionsFragment fragment = new InstructionsFragment();
         fragment.currentInstruction = currentInstruction;
         fragment.downloadIsFailed = false;
-        if (currentInstruction.content_id != null || currentInstruction.content_id.length() > 0)
+        if (currentInstruction.content_id != null && currentInstruction.content_id.length() > 0)
             DataManager.getInstance().getContent(currentInstruction.content_id)
-                .addOnDataReadyListener(new Reference.OnDataReadyListener<Content>() {
+                .addOnDataReadyListener(new OnDataChangeListener<Content>() {
                     @Override
-                    public void onDataReady(Content value) {
-                        DataManager.getInstance().downloadContent(value, new DataManager.OnDownloadFinishedListener() {
+                    public void onDataChange(Content newValue, int event) {
+                        DataManager.getInstance().downloadContent(newValue, new DataManager.OnDownloadFinishedListener() {
                             @Override
                             public void onDownloadFinished(Object result) {
                                 if (result instanceof Bitmap) {
@@ -87,7 +88,7 @@ public class InstructionsFragment extends Fragment {
                                 Log.w("DOWNLOAD", "Download failed.", e);
                                 fragment.setLoadingEnabled(false);
                             }
-                        }, fragment.getActivity());
+                        });
                     }
                 });
         return fragment;
@@ -172,7 +173,7 @@ public class InstructionsFragment extends Fragment {
                 });
             }
         });
-        timer.startTimer();
+        //timer.startTimer();
 
 
         return rootView;

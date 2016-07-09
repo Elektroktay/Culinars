@@ -38,11 +38,13 @@ public class ReferenceMultiple<T extends Data> {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                T data = dataSnapshot.getValue(dataClass);
-                data.setUid(dataSnapshot.getKey());
-                values.add(data);
-                for (OnDataChangeListener listener : listeners) {
-                    listener.onDataChange(data, DATA_ADDED);
+                if (dataSnapshot.getValue() != null) {
+                    T data = dataSnapshot.getValue(dataClass);
+                    data.setUid(dataSnapshot.getKey());
+                    values.add(data);
+                    for (OnDataChangeListener listener : listeners) {
+                        listener.onDataChange(data, DATA_ADDED);
+                    }
                 }
             }
 
@@ -94,9 +96,5 @@ public class ReferenceMultiple<T extends Data> {
 
     public void removeOnDataChangeListener(OnDataChangeListener<T> listener) {
         listeners.remove(listener);
-    }
-
-    public interface OnDataChangeListener<T> {
-        void onDataChange(T newValue, int event);
     }
 }

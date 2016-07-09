@@ -23,12 +23,17 @@ import android.widget.Toast;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.activity.RecipeActivity;
+import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Recipe;
+
+import java.util.ArrayList;
 
 public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> {
 
     Context context;
     ViewGroup parent;
+    ArrayList<Content> contents;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,7 +65,13 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
                 setUpTitle(holder, context, getDataAtPos(position).title);
             else
                 setUpTitle(holder, context, "Empty Title");
-            setUpImageView(holder, BitmapFactory.decodeResource(context.getResources(), R.drawable.pizza));
+            if (getImageAtPos(position) != null) {
+                setUpImageView(holder, getImageAtPos(position));
+                holder.cardLoading.setVisibility(View.INVISIBLE);
+            } else {
+                setUpImageView(holder, BitmapFactory.decodeResource(context.getResources(), R.drawable.gradient_black_horizontal));
+                holder.cardLoading.setVisibility(View.INVISIBLE);
+            }
             setUpStars(holder, getDataAtPos(position).getStarsAverage());
             setUpCalories(holder, getDataAtPos(position).calories, "calories");
             setUpTime(holder, getDataAtPos(position).time);
@@ -238,6 +249,7 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
     }
 
     public abstract Recipe getDataAtPos(int position);
+    public abstract Bitmap getImageAtPos(int position);
 
     public abstract void onFavoriteClick(int adapterPosition, ImageView cardFavorite);
 
@@ -249,6 +261,7 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         public RelativeLayout cardStarContainer;
         public View imageViewGradient;
         public CardView container;
+        public ProgressBar cardLoading;
 
         public FrameLayout cardBackContainer;
         public TextView cardCaloriesValue, cardCaloriesUnit;
@@ -272,6 +285,7 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
             container = (CardView) itemView.findViewById(R.id.card_container);
             cardFrontContainer = (FrameLayout) itemView.findViewById(R.id.card_front_container);
             cardStarContainer = (RelativeLayout) itemView.findViewById(R.id.star_container);
+            cardLoading = (ProgressBar) itemView.findViewById(R.id.recommendations_loading);
 
             cardBackContainer = (FrameLayout) itemView.findViewById(R.id.card_back_container);
             cardCaloriesValue = (TextView) itemView.findViewById(R.id.card_calories_value);
