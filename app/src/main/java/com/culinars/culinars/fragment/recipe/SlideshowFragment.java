@@ -2,8 +2,6 @@ package com.culinars.culinars.fragment.recipe;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,13 +15,16 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.Reference;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Content;
-import com.culinars.culinars.data.structure.Data;
 import com.culinars.culinars.data.structure.Recipe;
+import com.google.firebase.database.DataSnapshot;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.culinars.culinars.data.FB.fb;
 
 
 public class SlideshowFragment extends Fragment {
@@ -60,10 +61,25 @@ public class SlideshowFragment extends Fragment {
         return rootView;
     }
 
-    public static SlideshowFragment newInstance(Content content) {
+    public static SlideshowFragment newInstance(final Content content) {
         final SlideshowFragment fragment = new SlideshowFragment();
         fragment.currentContent = content;
         if (content != null) {
+            if (content.type == Content.TYPE_IMAGE) {
+                Picasso.with(fragment.getContext()).load(content.url).into(fragment.slideshowImage);
+            } else {
+                fragment.slideshowImage.setImageResource(R.drawable.pizza);
+                fragment.slideshowImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent videoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(content.url));
+                        videoIntent.setDataAndType(Uri.parse(content.url), "video/*");
+                        fragment.startActivity(videoIntent);
+                    }
+                });
+            }
+            /*
+            fragment.loadingBar.setVisibility(View.GONE);
             DataManager.getInstance().downloadContent(content, new DataManager.OnDownloadFinishedListener() {
                 @Override
                 public void onDownloadFinished(Object result) {
@@ -91,7 +107,7 @@ public class SlideshowFragment extends Fragment {
                     Log.w("DOWNLOAD", "Download failed.", e);
                     fragment.setLoadingEnabled(false);
                 }
-            });
+            });*/
         } else {
             Log.w("WTF", "WTF");
         }
@@ -110,14 +126,16 @@ public class SlideshowFragment extends Fragment {
 
     public static class PagerAdapter extends FragmentPagerAdapter {
 
-        ReferenceMultipleFromKeys<Content> data;
+        List<Content> data = new ArrayList<>();
         public PagerAdapter(FragmentManager fm, Recipe currentRecipe) {
             super(fm);
-            data = DataManager.getInstance().getRecipeContent(currentRecipe.uid);
-            data.addOnDataChangeListener(new OnDataChangeListener<Content>() {
+            fb().content().children(new ArrayList<>(currentRecipe.content.keySet())).getOnce().onComplete(new FB.CompleteListener() {
                 @Override
-                public void onDataChange(Content newValue, int event) {
-                    Log.w("DATA_REC", "DATA_RECEIVED:" + newValue.url);
+                public void onComplete(List<DataSnapshot> results) {
+                    data = new ArrayList<>();
+                    for (DataSnapshot s : results) {
+                        data.add(Content.from(s));
+                    }
                     notifyDataSetChanged();
                 }
             });
@@ -125,13 +143,13 @@ public class SlideshowFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            return SlideshowFragment.newInstance(data.getValueAt(position));
+            return SlideshowFragment.newInstance(data.get(position));
         }
 
         @Override
         public int getCount() {
             if (data != null)
-                return data.getValues().size();
+                return data.size();
             else
                 return 1;
         }

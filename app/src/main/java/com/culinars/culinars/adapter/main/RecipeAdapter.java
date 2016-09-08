@@ -7,7 +7,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,13 +18,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.activity.RecipeActivity;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.data.structure.User;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 
@@ -75,10 +75,18 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
             setUpStars(holder, getDataAtPos(position).getStarsAverage());
             setUpCalories(holder, getDataAtPos(position).calories, "calories");
             setUpTime(holder, getDataAtPos(position).time);
-            if (getDataAtPos(position).ingredients != null)
-                setUpIngredients(holder, getDataAtPos(position).getExistingIngredients(), getDataAtPos(position).ingredients.size());
-            else
-                setUpIngredients(holder, getDataAtPos(position).getExistingIngredients(), -1);
+            User.loadCurrent().onGet(new FB.GetListener() {
+                @Override
+                public void onDataChange(DataSnapshot s) {
+                    User res = User.from(s);
+                    if (res != null) {
+                        if (getDataAtPos(holder.getAdapterPosition()).ingredients != null)
+                            setUpIngredients(holder, res.getExistingIngredientCount(getDataAtPos(holder.getAdapterPosition())), getDataAtPos(holder.getAdapterPosition()).ingredients.size());
+                        else
+                            setUpIngredients(holder, res.getExistingIngredientCount(getDataAtPos(holder.getAdapterPosition())), -1);
+                    }
+                }
+            });
             setUpDifficulty(holder, getDataAtPos(position).difficulty_scale);
 
             holder.container.setOnClickListener(new View.OnClickListener() {
@@ -95,10 +103,16 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
                     context.startActivity(intent);
                 }
             });
-            if (getDataAtPos(position).isFavorite())
-                holder.cardFavorite.setImageResource(R.drawable.heart);
-            else
-                holder.cardFavorite.setImageResource(R.drawable.heart_outline);
+            User.loadCurrent().onGet(new FB.GetListener() {
+                @Override
+                public void onDataChange(DataSnapshot s) {
+                    User res = User.from(s);
+                    if (res != null) {
+                        Recipe cur = getDataAtPos(holder.getAdapterPosition());
+                        holder.cardFavorite.setImageResource(res.isFavorite(cur.uid)?R.drawable.heart:R.drawable.heart_outline);
+                    }
+                }
+            });
             holder.cardFavorite.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

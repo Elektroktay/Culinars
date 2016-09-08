@@ -3,28 +3,25 @@ package com.culinars.culinars.adapter.recipe;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.Rational;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Ingredient;
 import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.data.structure.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -51,16 +48,17 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
         if (currentRecipe.ingredients != null) {
             for (String ing : currentRecipe.ingredients.keySet()) {
                 ingredients.add(ing);
-                DataManager.getInstance().getIngredient(ing).addOnDataReadyListener(new OnDataChangeListener<Ingredient>() {
+                Ingredient.load(ing).getOnce().onGet(new FB.GetListener() {
                     @Override
-                    public void onDataChange(Ingredient newValue, int event) {
-                        if (newValue != null) {
-                            ingredientMap.put(newValue.name, newValue);
-                            RecipeIngredientsAdapter.this.notifyItemRangeChanged(0, getItemCount() - 1);
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Ingredient ingredient = Ingredient.from(dataSnapshot);
+                        if (ingredient != null) {
+                            ingredientMap.put(ingredient.name, ingredient);
+                            RecipeIngredientsAdapter.this.notifyItemRangeChanged(0, getItemCount()-1);
+                            Log.i("Ingredient_add", ingredient.name);
                         }
                     }
                 });
-                Log.i("Ingredient_add", ing);
             }
         }
     }
@@ -111,28 +109,38 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             } else {
                 valueText = currentRecipe.ingredients.get(ingredients.get(position));
             }
-            if (DataManager.getInstance().hasIngredient(ingredients.get(position))) {
-                holder.ingredients_title.setTextColor(Color.WHITE);
-                holder.ingredients_value_1.setTextColor(Color.WHITE);
-                holder.ingredients_value_2.setTextColor(Color.WHITE);
 
-                holder.ingredients_value_1.setText("");
-                holder.ingredients_value_2.setText(valueText);
-            } else {
-                holder.ingredients_title.setTextColor(Color.parseColor("#B91010"));
-                holder.ingredients_value_1.setTextColor(Color.parseColor("#B91010"));
-                holder.ingredients_value_2.setTextColor(Color.parseColor("#B91010"));
+            final String finalValueText = valueText;
+            User.loadCurrent().onGet(new FB.GetListener() {
+                @Override
+                public void onDataChange(DataSnapshot s) {
+                    User res = User.from(s);
+                    if (res != null) {
+                        if (res.hasIngredient(ingredients.get(position))) {
+                            holder.ingredients_title.setTextColor(Color.WHITE);
+                            holder.ingredients_value_1.setTextColor(Color.WHITE);
+                            holder.ingredients_value_2.setTextColor(Color.WHITE);
 
-                if (ingredientMap.containsKey(ingredients.get(position))) {
-                    double price = (double) (ingredientMap.get(ingredients.get(position)).price * servings) / 100;
-                    Log.w("PRICE", price + "");
-                    DecimalFormat df = new DecimalFormat("0.00");
-                    holder.ingredients_value_1.setText("$" + df.format(price));
+                            holder.ingredients_value_1.setText("");
+                            holder.ingredients_value_2.setText(finalValueText);
+                        } else {
+                            holder.ingredients_title.setTextColor(Color.parseColor("#B91010"));
+                            holder.ingredients_value_1.setTextColor(Color.parseColor("#B91010"));
+                            holder.ingredients_value_2.setTextColor(Color.parseColor("#B91010"));
+
+                            if (ingredientMap.containsKey(ingredients.get(position))) {
+                                double price = (double) (ingredientMap.get(ingredients.get(position)).price * servings) / 100;
+                                Log.w("PRICE", price + "");
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                holder.ingredients_value_1.setText("$" + df.format(price));
+                            }
+                            else
+                                holder.ingredients_value_1.setText("");
+                            holder.ingredients_value_2.setText(finalValueText); //TODO: DYNAMIC PRICE.
+                        }
+                    }
                 }
-                else
-                    holder.ingredients_value_1.setText("");
-                holder.ingredients_value_2.setText(valueText); //TODO: DYNAMIC PRICE.
-            }
+            });
 
             if (position % 2 == 0) {
                 holder.ingredients_card.setBackgroundColor(Color.TRANSPARENT);
@@ -193,10 +201,18 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
                 @Override
                 public void onClick(View v) {
                     for (final int pos : selectedValues) {
-                        DataManager.getInstance().setIngredient(ingredients.get(pos), true, new OnDataChangeListener<Ingredient>() {
+                        User.loadCurrent().onGet(new FB.GetListener() {
                             @Override
-                            public void onDataChange(Ingredient newValue, int event) {
-                                notifyItemChanged(pos);
+                            public void onDataChange(DataSnapshot s) {
+                                User res = User.from(s);
+                                if (res != null) {
+                                    res.setIngredient(ingredients.get(pos), true).onSet(new FB.SetListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                            notifyItemChanged(pos);
+                                        }
+                                    });
+                                }
                             }
                         });
                     }

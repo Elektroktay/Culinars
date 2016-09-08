@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="NumberPickerView-1.0.3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/cn.carbswang.android/NumberPickerView/1.0.3/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/cn.carbswang.android/NumberPickerView/1.0.3/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/cn.carbswang.android/NumberPickerView/1.0.3/733f8adfbd7f2938feef7717712df3cb7f0db6d4/NumberPickerView-1.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

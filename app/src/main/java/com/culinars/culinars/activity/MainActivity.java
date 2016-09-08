@@ -38,11 +38,11 @@ import android.widget.TextView;
 import com.culinars.culinars.MainPageChangeListener;
 import com.culinars.culinars.R;
 import com.culinars.culinars.adapter.main.RecommendationsSearchAdapter;
-import com.culinars.culinars.data.DataManager;
 import com.culinars.culinars.data.structure.Ingredient;
 import com.culinars.culinars.fragment.main.FavoritesFragment;
 import com.culinars.culinars.fragment.main.FridgeFragment;
 import com.culinars.culinars.fragment.main.RecommendationsFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -80,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         isSearching = false;
-
-        DataManager.getInstance().init(this);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -485,10 +483,10 @@ public class MainActivity extends AppCompatActivity {
         popup.inflate(R.menu.menu_user);
         popup.show();
         MenuItem loginItem = popup.getMenu().findItem(R.id.user_login);
-        loginItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+/*        loginItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                DataManager.getInstance().login();
+                FirebaseAuth.getInstance().signInAnonymously();
                 return false;
             }
         });
@@ -497,10 +495,10 @@ public class MainActivity extends AppCompatActivity {
         logoutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                DataManager.getInstance().logout();
+                FirebaseAuth.getInstance().signOut();
                 return false;
             }
-        });
+        });*/
     }
 
     @Override

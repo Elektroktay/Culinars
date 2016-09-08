@@ -1,25 +1,23 @@
 package com.culinars.culinars.data.structure;
 
-import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.culinars.culinars.data.DataManager;
+import com.culinars.culinars.data.FB;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.culinars.culinars.data.FB.fb;
 
 @IgnoreExtraProperties
 public class Recipe implements Serializable, Data{
     public String uid, title, owner_id, description, cuisine;
     public int difficulty_scale, time, calories, fat, serves;
+    public Map<String, Boolean> tags;
     public Map<String, Boolean> instructions, content;
     public Map<String, Integer> comments;
     public Map<String, String> ingredients;
@@ -53,16 +51,11 @@ public class Recipe implements Serializable, Data{
     }
 
     @Exclude
-    public int getStarsAverage() {
-        if (comments != null) {
-            int total = 0;
-            for (int i : comments.values()) {
-                total += i;
-            }
-            return total / comments.size();
-        } else {
-            return 0;
-        }
+    public static Recipe from(DataSnapshot s) {
+        Recipe r = s.getValue(Recipe.class);
+        if (r != null)
+            r.uid = s.getKey();
+        return r;
     }
 
     @Exclude
@@ -88,6 +81,39 @@ public class Recipe implements Serializable, Data{
         return result;
     }
 
+    public static FB.Request load(String uid) {
+        return fb().recipe().child(uid);
+    }
+
+    public FB.Result save() {
+        if (uid == null || uid.length() == 0)
+            uid = ((DatabaseReference)fb().recipe().ref()).push().getKey();
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null) {
+                    res.recipes.put(uid, true);
+                    res.save();
+                }
+            }
+        });
+        return fb().recipe().child(uid).set(this);
+    }
+
+    @Exclude
+    public int getStarsAverage() {
+        if (comments != null) {
+            int total = 0;
+            for (int i : comments.values()) {
+                total += i;
+            }
+            return total / comments.size();
+        } else {
+            return 0;
+        }
+    }
+
     @Exclude
     @Override
     public boolean equals(Object o) {
@@ -95,21 +121,18 @@ public class Recipe implements Serializable, Data{
     }
 
     @Exclude
-    public boolean isFavorite() {
-        User user = DataManager.getInstance().getUser().getValue();
-        return user != null && user.favorites != null && user.favorites.containsKey(uid);
+    public FB.Request getIngredients() {
+        return ingredients==null?null:fb().ingredient().children(new ArrayList<>(ingredients.keySet()));
     }
 
     @Exclude
-    public int getExistingIngredients() {
-        if (ingredients == null)
-            return 0;
-        int total = 0;
-        for (String ingredient : ingredients.keySet()) {
-            if (DataManager.getInstance().hasIngredient(ingredient))
-                total++;
-        }
-        return total;
+    public FB.Request getInstructions() {
+        return instructions==null?null:fb().withQuery(((DatabaseReference)fb().instruction().children(new ArrayList<>(instructions.keySet())).ref()).orderByChild("position"));
+    }
+
+    @Exclude
+    public FB.Request getSimilar() {
+        return fb().child("similar_recipes").child(uid).then().recipe();
     }
 
     @Override

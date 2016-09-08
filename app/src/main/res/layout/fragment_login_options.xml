@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--tools:showIn="@layout/activity_splash"-->
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="75dp"
+        android:layout_gravity="center"
+        app:buttonSize="wide"/>
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebook_button"
+        android:layout_width="195dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="25dp"
+        android:paddingTop="13sp"
+        android:paddingBottom="13sp"
+        android:textSize="14sp"
+        android:paddingStart="10dp"
+        android:paddingLeft="10dp"
+        android:layout_gravity="center"/>
+<!--    <in.championswimmer.libsocialbuttons.buttons.BtnFacebook
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="25dp"
+        android:text="Sign in with Facebook"
+        android:backgroundTint="#3B5998"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        android:padding="0dp"
+        android:paddingStart="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:drawablePadding="0dp"
+        android:layout_gravity="center"
+        android:elevation="2dp"/>-->
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/go_login_button"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="52.5dp"
+        android:layout_marginRight="52.5dp"
+        android:text="Sign In"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        android:elevation="2dp"
+        android:layout_gravity="center"/>
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/go_register_button"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="52.5dp"
+        android:layout_marginLeft="52.5dp"
+        android:text="Sign Up"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        android:elevation="2dp"
+        android:layout_gravity="center"/>
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/continue_button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="75dp"
+        android:text="Let me continue for now"
+        android:textColor="@android:color/white"
+        android:background="@android:color/transparent"
+        android:layout_gravity="center"/>
+
+</FrameLayout>

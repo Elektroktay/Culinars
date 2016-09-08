@@ -1,10 +1,15 @@
 package com.culinars.culinars.data.structure;
 
+import com.culinars.culinars.data.FB;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.culinars.culinars.data.FB.fb;
 
 @IgnoreExtraProperties
 public class Content implements Data{
@@ -32,6 +37,26 @@ public class Content implements Data{
         result.put("url", url);
         result.put("type", type);
         return result;
+    }
+
+    @Exclude
+    public static Content from(DataSnapshot s) {
+        Content c = s.getValue(Content.class);
+        if (c != null)
+            c.uid = s.getKey();
+        return c;
+    }
+
+    @Exclude
+    public static FB.Request load(String uid) {
+        return fb().child("content").child(uid);
+    }
+
+    @Exclude
+    public FB.Result save() {
+        if (uid == null || uid.length() == 0)
+            uid = ((DatabaseReference)fb().content().ref()).push().getKey();
+        return fb().content().child(uid).set(this);
     }
 
     @Exclude

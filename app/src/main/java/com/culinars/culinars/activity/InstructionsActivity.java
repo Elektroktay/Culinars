@@ -1,7 +1,5 @@
 package com.culinars.culinars.activity;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,21 +8,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Instruction;
 import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.fragment.recipe.InstructionsFragment;
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.List;
 
 public class InstructionsActivity extends AppCompatActivity {
 
@@ -39,7 +33,7 @@ public class InstructionsActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private Recipe currentRecipe;
-    private ReferenceMultipleFromKeys<Instruction> instructions;
+    private List<Instruction> instructions;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -61,10 +55,12 @@ public class InstructionsActivity extends AppCompatActivity {
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        instructions = DataManager.getInstance().getInstructions(currentRecipe.uid);
-        instructions.addOnDataChangeListener(new OnDataChangeListener<Instruction>() {
+        currentRecipe.getInstructions().getOnce().onComplete(new FB.CompleteListener() {
             @Override
-            public void onDataChange(Instruction newValue, int event) {
+            public void onComplete(List<DataSnapshot> results) {
+                for (DataSnapshot s : results) {
+                    instructions.add(Instruction.from(s));
+                }
                 mSectionsPagerAdapter.notifyDataSetChanged();
             }
         });
@@ -127,13 +123,13 @@ public class InstructionsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return InstructionsFragment.newInstance(instructions.getValueAt(position));
+            return InstructionsFragment.newInstance(instructions.get(position));
         }
 
         @Override
         public int getCount() {
             if (instructions != null)
-                return instructions.getValues().size();
+                return instructions.size();
             else
                 return 0;
         }

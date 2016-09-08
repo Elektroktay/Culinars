@@ -1,10 +1,15 @@
 package com.culinars.culinars.data.structure;
 
+import com.culinars.culinars.data.FB;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.culinars.culinars.data.FB.fb;
 
 @IgnoreExtraProperties
 public class Comment implements Data{
@@ -35,6 +40,38 @@ public class Comment implements Data{
         result.put("text", text);
         result.put("stars", stars);
         return result;
+    }
+
+    @Exclude
+    public static Content from(DataSnapshot s) {
+        Content c = s.getValue(Content.class);
+        if (c != null)
+            c.uid = s.getKey();
+        return c;
+    }
+
+    @Exclude
+    public static FB.Request load(String uid) {
+        return fb().comment().child(uid);
+    }
+
+    @Exclude
+    public FB.Result[] save() {
+        if (uid == null || uid.length() == 0)
+            uid = ((DatabaseReference)fb().comment().ref()).push().getKey();
+        FB.Result request1 = fb().comment().child(uid).set(this);
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null) {
+                    res.comments.put(uid, true);
+                    res.save();
+                }
+            }
+        });
+        FB.Result request2 = fb().recipe().child(recipe_id).comment().child(uid).set(stars);
+        return new FB.Result[]{request1, request2};
     }
 
     @Exclude

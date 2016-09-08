@@ -1,20 +1,22 @@
 package com.culinars.culinars.adapter.main;
 
 
-import android.util.Log;
-import android.widget.ImageView;
-
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
-import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.data.FB;
+import com.culinars.culinars.data.structure.User;
+import com.google.firebase.database.DataSnapshot;
 
 public class FavoritesAdapter2 extends RecommendationsAdapter {
 
     @Override
     public void refreshData() {
-        data = DataManager.getInstance().getFavorites();
-        data.addOnDataChangeListener(getListener());
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null)
+                    res.getFavorites().getOnce().onComplete(getListener());
+            }
+        });
     }
 
 }

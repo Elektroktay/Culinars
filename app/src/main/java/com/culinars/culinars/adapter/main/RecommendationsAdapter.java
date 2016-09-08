@@ -5,24 +5,22 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.Reference;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Content;
-import com.culinars.culinars.data.structure.Data;
 import com.culinars.culinars.data.structure.Recipe;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
 import com.culinars.culinars.data.structure.User;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class RecommendationsAdapter extends RecipeAdapter {
 
     int resultCount;
-    public ReferenceMultipleFromKeys<Recipe> data;
+    public List<Recipe> data;
     public Map<String, Content> contents;
     public Map<String, Bitmap> images;
 
@@ -40,7 +38,7 @@ public class RecommendationsAdapter extends RecipeAdapter {
     @Override
     public Recipe getDataAtPos(int position) {
         if (data != null)
-            return data.getValueAt(position);
+            return data.get(position);
         else
             return null;
     }
@@ -56,19 +54,23 @@ public class RecommendationsAdapter extends RecipeAdapter {
     }
 
     public int getPositionOfRecipe(Recipe recipe) {
-        return data.getValues().indexOf(recipe);
+        return data.indexOf(recipe);
     }
 
 
     @Override
     public void onFavoriteClick(final int position, final ImageView cardFavorite) {
-        if (getDataAtPos(position).isFavorite()) {
-            DataManager.getInstance().setFavorite(getDataAtPos(position).uid, false);
-            cardFavorite.setImageResource(R.drawable.heart_outline);
-        } else {
-            DataManager.getInstance().setFavorite(getDataAtPos(position).uid, true);
-            cardFavorite.setImageResource(R.drawable.heart);
-        }
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null) {
+
+                    res.setFavorite(getDataAtPos(position).uid, !res.isFavorite(getDataAtPos(position).uid));
+                    cardFavorite.setImageResource(res.isFavorite(getDataAtPos(position).uid) ? R.drawable.heart : R.drawable.heart_outline);
+                }
+            }
+        });
 
 /*        DataManager.getInstance().getUser().addOnDataReadyListener(new Reference.OnDataReadyListener<User>() {
             @Override
@@ -84,45 +86,38 @@ public class RecommendationsAdapter extends RecipeAdapter {
         });*/
     }
 
+
     public void refreshData() {
-        data = DataManager.getInstance().getRecommendations(DataManager.getInstance().getCurrentUser().getUid(), resultCount);
-        data.addOnDataChangeListener(getListener());
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null)
+                    res.getRecommendations(0, resultCount).getOnce().onComplete(getListener());
+            }
+        });
     }
 
-    public OnDataChangeListener<Recipe> getListener() {
-        return new OnDataChangeListener<Recipe>() {
+    public FB.CompleteListener getListener() {
+        return new FB.CompleteListener() {
             @Override
-            public void onDataChange(final Recipe newRecipe, int event) {
-                if (!contents.containsKey(newRecipe.uid)) {
-                    final ReferenceMultipleFromKeys<Content> contentRef = DataManager.getInstance().getRecipeContent(newRecipe.uid);
-                    contentRef.addOnDataChangeListener(new OnDataChangeListener<Content>() {
-                        @Override
-                        public void onDataChange(final Content newContent, int event) {
-                            if (!contents.containsKey(newRecipe.uid)) {
-                                contents.put(newRecipe.uid, newContent);
-                                if (!images.containsKey(newRecipe.uid)) {
-                                    DataManager.getInstance().downloadContent(newContent, new DataManager.OnDownloadFinishedListener() {
-                                        @Override
-                                        public void onDownloadFinished(Object result) {
-                                            if (result instanceof Bitmap) {
-                                                images.put(newRecipe.uid, (Bitmap) result);
-                                                notifyItemChanged(getPositionOfRecipe(newRecipe));
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onDownloadFailed(Exception e) {
-                                            Log.w("RECOM_DOWNL", "Download failed :(", e);
-                                        }
-                                    });
-                                }
-                            }
-                            contentRef.removeOnDataChangeListener(this);
-                        }
-                    });
+            public void onComplete(List<DataSnapshot> results) {
+                if (results.size() > 0) {
+                    if (results.get(0).getKey().equals("recipes")) {
+                        Iterable<DataSnapshot> children = results.get(0).getChildren();
+                        results.clear();
+                        for (DataSnapshot s : children)
+                            results.add(s);
+                    }
+                    data = new ArrayList<>();
+                    for (DataSnapshot d : results) {
+                        if (d != null)
+                            data.add(Recipe.from(d));
+                        else
+                            Log.w("RecommendationsAdapter", "Refresh returned null value.");
+                    }
+                    notifyDataSetChanged();
                 }
-                //notifyItemInserted(getPositionOfRecipe(newRecipe));
-                notifyDataSetChanged();
             }
         };
     }
@@ -130,7 +125,7 @@ public class RecommendationsAdapter extends RecipeAdapter {
     @Override
     public int getItemCount() {
         if (data != null)
-            return data.getValues().size()+1;
+            return data.size()+1;
         else
             return 1;
     }

@@ -2,15 +2,10 @@ package com.culinars.culinars.fragment.recipe;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,40 +16,33 @@ import android.widget.TextView;
 
 import com.culinars.culinars.R;
 import com.culinars.culinars.Timer;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.Reference;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Instruction;
-import com.culinars.culinars.data.structure.Recipe;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.database.DataSnapshot;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class InstructionsFragment extends Fragment {
 
     private Instruction currentInstruction;
-    private Bitmap currentImage;
+/*    private Bitmap currentImage;
     private String videoUrl;
-    private boolean downloadIsFailed;
+    private boolean downloadIsFailed;*/
 
     private boolean timerEnabled = false;
     private Timer timer;
     private PieChart timerView;
     private ProgressBar mediaLoading;
+    private RoundedImageView mediaImage;
 
     public InstructionsFragment() {
     }
@@ -62,9 +50,31 @@ public class InstructionsFragment extends Fragment {
     public static InstructionsFragment newInstance(Instruction currentInstruction) {
         final InstructionsFragment fragment = new InstructionsFragment();
         fragment.currentInstruction = currentInstruction;
-        fragment.downloadIsFailed = false;
+//        fragment.downloadIsFailed = false;
         if (currentInstruction.content_id != null && currentInstruction.content_id.length() > 0)
-            DataManager.getInstance().getContent(currentInstruction.content_id)
+            Content.load(currentInstruction.content_id).getOnce().onGet(new FB.GetListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    final Content content = Content.from(dataSnapshot);
+                    if (content != null) {
+                        if (content.type == Content.TYPE_IMAGE)
+                            Picasso.with(fragment.getContext()).load(content.url).into(fragment.mediaImage);
+                        else {
+                            fragment.mediaImage.setImageResource(R.drawable.pizza);
+                            fragment.mediaImage.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent videoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(content.url));
+                                    videoIntent.setDataAndType(Uri.parse(content.url), "video/*");
+                                    fragment.startActivity(videoIntent);
+                                }
+                            });
+                        }
+                        fragment.mediaLoading.setVisibility(View.GONE);
+                    }
+                }
+            });
+/*            DataManager.getInstance().getContent(currentInstruction.content_id)
                 .addOnDataReadyListener(new OnDataChangeListener<Content>() {
                     @Override
                     public void onDataChange(Content newValue, int event) {
@@ -90,7 +100,7 @@ public class InstructionsFragment extends Fragment {
                             }
                         });
                     }
-                });
+                });*/
         return fragment;
     }
 
@@ -106,32 +116,14 @@ public class InstructionsFragment extends Fragment {
 
         FrameLayout mediaContainer = (FrameLayout) rootView.findViewById(R.id.instructions_media_container);
         mediaLoading = (ProgressBar) rootView.findViewById(R.id.instructions_loading);
-        RoundedImageView mediaImage = (RoundedImageView) rootView.findViewById(R.id.instructions_image);
+        mediaImage = (RoundedImageView) rootView.findViewById(R.id.instructions_image);
         if (currentInstruction.content_id == null || currentInstruction.content_id.length() == 0)
             mediaContainer.setVisibility(View.GONE);
-        else if (currentImage == null) {
+        else {
             mediaContainer.setVisibility(View.VISIBLE);
             mediaImage.setVisibility(View.INVISIBLE);
             mediaLoading.setVisibility(View.VISIBLE);
-        } else {
-            mediaContainer.setVisibility(View.VISIBLE);
-            mediaImage.setVisibility(View.VISIBLE);
-            if (videoUrl != null || videoUrl.length() > 0) {
-                mediaImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent videoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
-                        videoIntent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                        startActivity(videoIntent);
-                    }
-                });
-            }
-            mediaLoading.setVisibility(View.INVISIBLE);
-            mediaImage.setImageBitmap(currentImage);
         }
-        if (downloadIsFailed)
-            mediaLoading.setVisibility(View.GONE);
-
 
         timerView = (PieChart) rootView.findViewById(R.id.instructions_timer);
         timerView.setUsePercentValues(false);
@@ -197,14 +189,14 @@ public class InstructionsFragment extends Fragment {
         super.onStop();
     }
 
-    private void setLoadingEnabled(boolean enabled) {
+/*    private void setLoadingEnabled(boolean enabled) {
         if (mediaLoading != null) {
             if (enabled)
                 mediaLoading.setVisibility(View.VISIBLE);
             else
                 mediaLoading.setVisibility(View.INVISIBLE);
         }
-    }
+    }*/
 
     private void refreshData(int current, int max) {
         Log.w("REFRESH_DATA", "current:" + current + " max:" + max);

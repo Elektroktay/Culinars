@@ -9,18 +9,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.ReferenceMultiple;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Ingredient;
+import com.culinars.culinars.data.structure.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder> {
 
     Context context;
     int dataLimit;
-    private ReferenceMultiple<Ingredient> data;
+    private List<Ingredient> data = new ArrayList<>();
 
 
     public FridgeAdapter() {
@@ -36,11 +42,16 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         return new ViewHolder(v);
     }
 
-    public void refreshData(String completionText) {
-        data = DataManager.getInstance().findIngredient(completionText, dataLimit);
-        data.addOnDataChangeListener(new OnDataChangeListener<Ingredient>() {
+    private void refreshData(String completionText) {
+        Ingredient.find(completionText, dataLimit).getOnce().onGet(new FB.GetListener() {
             @Override
-            public void onDataChange(Ingredient newValue, int event) {
+            public void onDataChange(DataSnapshot s) {
+                data.clear();
+                for (DataSnapshot s1 : s.getChildren()) {
+                    Ingredient i = Ingredient.from(s1);
+                    if (i != null)
+                        data.add(i);
+                }
                 notifyDataSetChanged();
             }
         });
@@ -48,41 +59,50 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        if (DataManager.getInstance().hasIngredient(data.getValueAt(position).name))
-            holder.fridge_check.setImageResource(R.drawable.check_green);
-        else
-            holder.fridge_check.setImageResource(R.drawable.check_white);
+        final Ingredient current = data.get(position);
+        if (current == null)
+            return;
+        User.loadCurrent().onGet(new FB.GetListener() {
+            @Override
+            public void onDataChange(DataSnapshot s) {
+                User res = User.from(s);
+                if (res != null) {
+                    holder.fridge_check.setImageResource(res.hasIngredient(current.name) ? R.drawable.check_green : R.drawable.check_white);
+                }
+            }
+        });
 
-        holder.fridge_text.setText(data.getValueAt(position).name);
+        holder.fridge_text.setText(current.name);
         holder.fridge_image.setImageResource(R.drawable.cooking_prep3);
         holder.fridge_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (DataManager.getInstance().hasIngredient(data.getValueAt(holder.getAdapterPosition()).name)) {
-                    DataManager.getInstance().setIngredient(data.getValueAt(holder.getAdapterPosition()).name, false, new OnDataChangeListener<Ingredient>() {
+                final String ing = current.name;
+                if (ing != null && ing.length() > 0) {
+                    User.loadCurrent().onGet(new FB.GetListener() {
                         @Override
-                        public void onDataChange(Ingredient newValue, int event) {
-                            notifyItemChanged(holder.getAdapterPosition());
+                        public void onDataChange(DataSnapshot s) {
+                            User res = User.from(s);
+                            if (res != null) {
+                                res.setIngredient(ing, !res.hasIngredient(ing)).onSet(new FB.SetListener() {
+                                    @Override
+                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                        Log.d("FridgeAdapter", "pos: " + holder.getAdapterPosition());
+                                        notifyItemChanged(holder.getAdapterPosition());
+                                    }
+                                });
+                            }
                         }
                     });
-                } else {
-                    DataManager.getInstance().setIngredient(data.getValueAt(holder.getAdapterPosition()).name, true, new OnDataChangeListener<Ingredient>() {
-                        @Override
-                        public void onDataChange(Ingredient newValue, int event) {
-                            notifyItemChanged(holder.getAdapterPosition());
-                        }
-                    });
-                }
+                } else
+                    Toast.makeText(FridgeAdapter.this.context, "Ingredient name is null.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        if (data != null)
-            return data.getValues().size();
-        else
-            return 5;
+        return data.size();
     }
 
     public void updateSearchParams(String searchQuery) {
@@ -91,7 +111,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
             String rest = searchQuery.substring(1);
             refreshData(firstLetter.toUpperCase() + rest);
         } else {
-            refreshData(searchQuery);
+            refreshData(searchQuery.toUpperCase());
         }
     }
 

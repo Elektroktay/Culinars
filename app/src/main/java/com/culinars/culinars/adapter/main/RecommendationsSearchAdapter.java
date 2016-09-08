@@ -1,13 +1,11 @@
 package com.culinars.culinars.adapter.main;
 
 
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.ReferenceMultiple;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.DM;
 import com.culinars.culinars.data.structure.Recipe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecommendationsSearchAdapter extends RecommendationsAdapter {
 
@@ -15,6 +13,9 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
     private int searchMaxTime, searchMaxCalories;
     ArrayList<String> searchIngredients;
     boolean searchOnlyCurrentIngredients;
+
+    int resultCount = 10;
+    List<Recipe> data;
 
     public void updateSearchParams(String searchQuery, int searchMaxTime, int searchMaxCalories, ArrayList<String> searchIngredients, String searchCuisine, boolean searchOnlyCurrentIngredients) {
         if (searchQuery.length() > 1) {
@@ -32,9 +33,6 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
         refreshData();
     }
 
-    int resultCount = 10;
-    ReferenceMultiple<Recipe> data;
-
     public RecommendationsSearchAdapter() {
         this(10);
     }
@@ -48,19 +46,19 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
     @Override
     public Recipe getDataAtPos(int position) {
         if (data != null)
-            return data.getValueAt(position);
+            return data.get(position);
         else
             return null;
     }
 
     @Override
     public int getPositionOfRecipe(Recipe recipe) {
-        return data.getValues().indexOf(recipe);
+        return data.indexOf(recipe);
     }
 
     @Override
     public void refreshData() {
-        data = DataManager.getInstance().searchRecipes(
+        DM.getInstance().searchRecipes(
                 searchQuery,
                 searchMaxTime,
                 searchMaxCalories,
@@ -74,7 +72,7 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
     @Override
     public int getItemCount() {
         if (data != null)
-            return data.getValues().size()+1;
+            return data.size()+1;
         else
             return 1;
     }

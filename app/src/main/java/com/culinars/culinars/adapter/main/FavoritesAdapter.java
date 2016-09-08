@@ -10,16 +10,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.culinars.culinars.R;
-import com.culinars.culinars.data.DataManager;
-import com.culinars.culinars.data.OnDataChangeListener;
-import com.culinars.culinars.data.ReferenceMultipleFromKeys;
+import com.culinars.culinars.data.FB;
 import com.culinars.culinars.data.structure.Recipe;
+import com.culinars.culinars.data.structure.User;
 import com.culinars.culinars.fragment.main.FavoritesFragment;
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.ViewHolder> {
 
     Context context;
-    ReferenceMultipleFromKeys<Recipe> data;
+    List<Recipe> data;
     FavoritesFragment fragment;
 
     public FavoritesAdapter(FavoritesFragment fragment) {
@@ -28,12 +31,21 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
     }
 
     private void refreshData() {
-        data = DataManager.getInstance().getFavorites();
-        data.addOnDataChangeListener(new OnDataChangeListener<Recipe>() {
-
+        User.loadCurrent().onGet(new FB.GetListener() {
             @Override
-            public void onDataChange(Recipe newValue, int event) {
-                notifyDataSetChanged();
+            public void onDataChange(DataSnapshot s1) {
+                User res = User.from(s1);
+                if (res != null)
+                    res.getFavorites().getOnce().onComplete(new FB.CompleteListener() {
+                    @Override
+                    public void onComplete(List<DataSnapshot> results) {
+                        data = new ArrayList<>();
+                        for (DataSnapshot s : results) {
+                            data.add(Recipe.from(s));
+                        }
+                        notifyDataSetChanged();
+                    }
+                });
             }
         });
     }
@@ -48,8 +60,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (position == 0)
-            holder.favorite_number.setText("" + data.getValues().size());
+        if (position == 0 && data != null)
+            holder.favorite_number.setText("" + data.size());
         else
             holder.favorite_number.setText("0");
         switch (position) {

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.culinars.culinars.data.DataManager;
 import com.culinars.culinars.data.structure.Ingredient;
 import com.tokenautocomplete.TokenCompleteTextView;
 
