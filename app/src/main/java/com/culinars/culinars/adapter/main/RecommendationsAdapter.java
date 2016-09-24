@@ -44,9 +44,9 @@ public class RecommendationsAdapter extends RecipeAdapter {
     }
 
     @Override
-    public Bitmap getImageAtPos(int position) {
+    public Content getContentAtPos(int position) {
         try {
-            return images.get(getDataAtPos(position).uid);
+            return contents.get(getDataAtPos(position).uid);
         } catch (NullPointerException e) {
             Log.w("NULLL", ":(", e);
             return null;
@@ -60,7 +60,7 @@ public class RecommendationsAdapter extends RecipeAdapter {
 
     @Override
     public void onFavoriteClick(final int position, final ImageView cardFavorite) {
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);
@@ -88,12 +88,14 @@ public class RecommendationsAdapter extends RecipeAdapter {
 
 
     public void refreshData() {
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);
-                if (res != null)
+                Log.d("RecAdapter", "recommendations: " + (res==null?"user_is_null":res.recommendations));
+                if (res != null && res.recommendations != null) {
                     res.getRecommendations(0, resultCount).getOnce().onComplete(getListener());
+                }
             }
         });
     }
@@ -103,7 +105,9 @@ public class RecommendationsAdapter extends RecipeAdapter {
             @Override
             public void onComplete(List<DataSnapshot> results) {
                 if (results.size() > 0) {
-                    if (results.get(0).getKey().equals("recipes")) {
+                    if (results.get(0).getKey().equals("recipes")
+                            || results.get(0).getKey().equals("recommendations")
+                            || results.get(0).getKey().equals("suggestions")) {
                         Iterable<DataSnapshot> children = results.get(0).getChildren();
                         results.clear();
                         for (DataSnapshot s : children)
@@ -111,10 +115,18 @@ public class RecommendationsAdapter extends RecipeAdapter {
                     }
                     data = new ArrayList<>();
                     for (DataSnapshot d : results) {
-                        if (d != null)
-                            data.add(Recipe.from(d));
-                        else
-                            Log.w("RecommendationsAdapter", "Refresh returned null value.");
+                        Log.d("RecAdapter iteration", "adding id: " + d.getKey());
+                        final Recipe r = Recipe.from(d);
+                        data.add(r);
+                        if (r.content != null && r.content.size() > 0) {
+                            Content.load(r.content.keySet().iterator().next()).getOnce().onGet(new FB.GetListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot s) {
+                                    Content res = Content.from(s);
+                                    contents.put(r.uid, res);
+                                }
+                            });
+                        }
                     }
                     notifyDataSetChanged();
                 }

@@ -111,7 +111,7 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             }
 
             final String finalValueText = valueText;
-            User.loadCurrent().onGet(new FB.GetListener() {
+            User.current().onGet(new FB.GetListener() {
                 @Override
                 public void onDataChange(DataSnapshot s) {
                     User res = User.from(s);
@@ -201,7 +201,7 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
                 @Override
                 public void onClick(View v) {
                     for (final int pos : selectedValues) {
-                        User.loadCurrent().onGet(new FB.GetListener() {
+                        User.current().onGet(new FB.GetListener() {
                             @Override
                             public void onDataChange(DataSnapshot s) {
                                 User res = User.from(s);

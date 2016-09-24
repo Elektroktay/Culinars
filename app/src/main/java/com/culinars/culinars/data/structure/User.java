@@ -23,15 +23,11 @@ public class User implements Data{
     public Map<String, Boolean> history, favorites, ingredients, comments, recipes;
     public Map<String, Boolean> recommendations;
 
-    @Exclude private static User currentUser;
+
     @Exclude private static FB.Result userResult;
 
     public User() {
 
-    }
-
-    public static void updateUser(User user) {
-        currentUser = user;
     }
 
     public User(String uid, String nickname, String email) {
@@ -78,7 +74,7 @@ public class User implements Data{
     }
 
     @Exclude
-    public static FB.Result loadCurrent() {
+    public static FB.Result current() {
         if (userResult == null)
             userResult = fb().user().child(FirebaseAuth.getInstance().getCurrentUser().getUid()).get();
         return userResult;
@@ -101,7 +97,7 @@ public class User implements Data{
         if (to <= from)
             throw new IllegalArgumentException("to must be greater than from. from:" + from + " to:" + to);
         if (recommendations.size() <= to)
-            to = recommendations.size() - 1;
+            to = recommendations.size();
 
         String[] resultIds = new String[to - from];
         String[] recommendationIds = recommendations.keySet().toArray(new String[1]);

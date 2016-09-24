@@ -2,55 +2,41 @@ package com.culinars.culinars.activity;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AnticipateOvershootInterpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.culinars.culinars.NonSwipeableViewPager;
 import com.culinars.culinars.R;
 import com.culinars.culinars.adapter.SplashLoginAdapter;
 import com.culinars.culinars.data.FB;
-import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.data.structure.User;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import static com.culinars.culinars.data.FB.fb;
 
+/**
+ * The activity that shows the splash screen.
+ * Also prepares the current user before starting the app.
+ */
 public class SplashActivity extends AppCompatActivity {
 
     public ImageView logo;
@@ -58,18 +44,24 @@ public class SplashActivity extends AppCompatActivity {
     public FrameLayout wrapper;
     public ViewPager loginPager;
 
+    FirebaseAuth.AuthStateListener authStateListener;
+    Runnable signInAction;
+
     public LoginButton facebookButton;
     public SignInButton googleButton;
     public AppCompatEditText loginEmail, loginPassword, registerEmail, registerPassword;
     public AppCompatButton loginButton, registerButton, goLoginButton, goRegisterButton, continueButton;
     private GoogleApiClient mGoogleApiClient;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        //Hide the toolbar if exists.
         if (getSupportActionBar() != null)
             getSupportActionBar().hide();
+        //Load xml to the screen.
         setContentView(R.layout.activity_splash);
 
         wrapper = (FrameLayout) findViewById(R.id.wrapper);
@@ -105,7 +97,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 //Is logged in.
                 User.create(getCurrentUser().getUid());
-                User.loadCurrent();
+                User.current();
             }
         }, new Runnable() {
             @Override
@@ -132,7 +124,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onDataChange(Object newValue, int event) {
                 Log.w("SPLASH_ACT", "2");
-                User.loadCurrent().addListener(new DataListener<User>() {
+                User.current().addListener(new DataListener<User>() {
                     @Override
                     public void onDataChange(User newValue, int event) {
                         Log.w("SPLASH_ACT", "3");
@@ -194,32 +186,36 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+         signInAction = new Runnable() {
+            @Override
+            public void run() {
+                final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                User.current().onGet(new FB.GetListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User u = User.from(dataSnapshot);
+                        if (u==null) {
+                            if (FirebaseAuth.getInstance().getCurrentUser().getEmail() == null)
+                                u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", "");
+                            else
+                                u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                            fb().user().child(uid).set(u);
+                        } else {
+                            if (signInAction != null) {
+                                startApp();
+                                FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+                                signInAction = null;
+                            }
+                        }
+                    }
+                });
+            }
+        };
 
-        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+        authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 Toast.makeText(SplashActivity.this, "Auth state: " + (firebaseAuth.getCurrentUser()==null?"logged out":"logged in as:" + firebaseAuth.getCurrentUser().getUid()), Toast.LENGTH_SHORT).show();
-                final Runnable signInAction = new Runnable() {
-                    @Override
-                    public void run() {
-                        final String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        User.loadCurrent().onGet(new FB.GetListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                User u = User.from(dataSnapshot);
-                                if (u==null) {
-                                    if (FirebaseAuth.getInstance().getCurrentUser().getEmail() == null)
-                                        u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", "");
-                                    else
-                                        u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                                    fb().user().child(uid).set(u);
-                                } else {
-                                    startApp();
-                                }
-                            }
-                        });
-                    }
-                };
                 if (firebaseAuth.getCurrentUser() == null) {
                     firebaseAuth.signInAnonymously().addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -228,7 +224,8 @@ public class SplashActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    signInAction.run();
+                    if (signInAction != null)
+                        signInAction.run();
                 }
             }
         };
@@ -245,7 +242,7 @@ public class SplashActivity extends AppCompatActivity {
                     Log.w("SPLASH", "2, " + FirebaseAuth.getInstance().getCurrentUser().getUid());
                     if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                         Log.w("SPLASH", "3");
-                        User.loadCurrent().addListener(new DataListener<User>() {
+                        User.current().addListener(new DataListener<User>() {
                             @Override
                             public void onDataChange(User newValue, int event) {
                                 Log.w("SPLASH", "4" + (newValue == null));
@@ -259,7 +256,7 @@ public class SplashActivity extends AppCompatActivity {
                                     u.save(new DataListener<User>() {
                                         @Override
                                         public void onDataChange(User newValue, int event) {
-                                            User.loadCurrent().addListener(new DataListener<User>() {
+                                            User.current().addListener(new DataListener<User>() {
                                                 @Override
                                                 public void onDataChange(User newValue, int event) {
                                                     Log.w("SPLASH", "5");
@@ -330,6 +327,9 @@ public class SplashActivity extends AppCompatActivity {
         }*/
     }
 
+    /**
+     * Animates the Culinars logo and login options to their appropriate positions.
+     */
     private void animateLogin() {
         logo.animate()
                 .translationY((float)(-((wrapper.getHeight()/2)*0.8)))
@@ -346,9 +346,12 @@ public class SplashActivity extends AppCompatActivity {
                 .start();
     }
 
+    /**
+     * Launches MainActivity.
+     */
     private void startApp() {
         Toast.makeText(this, "Starting app.", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 /*
@@ -365,6 +368,11 @@ public class SplashActivity extends AppCompatActivity {
         });
     }*/
 
+    /**
+     * Converts dp to px.
+     * @param dp Amount of dp to be converted.
+     * @return Corresponding px amount.
+     */
     public float dpToPx(float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }

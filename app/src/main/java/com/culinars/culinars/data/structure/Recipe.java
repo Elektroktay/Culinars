@@ -88,7 +88,7 @@ public class Recipe implements Serializable, Data{
     public FB.Result save() {
         if (uid == null || uid.length() == 0)
             uid = ((DatabaseReference)fb().recipe().ref()).push().getKey();
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);

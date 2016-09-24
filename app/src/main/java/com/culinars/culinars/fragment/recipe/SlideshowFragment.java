@@ -129,16 +129,17 @@ public class SlideshowFragment extends Fragment {
         List<Content> data = new ArrayList<>();
         public PagerAdapter(FragmentManager fm, Recipe currentRecipe) {
             super(fm);
-            fb().content().children(new ArrayList<>(currentRecipe.content.keySet())).getOnce().onComplete(new FB.CompleteListener() {
-                @Override
-                public void onComplete(List<DataSnapshot> results) {
-                    data = new ArrayList<>();
-                    for (DataSnapshot s : results) {
-                        data.add(Content.from(s));
+            if (currentRecipe.content != null && currentRecipe.content.size() > 0)
+                fb().content().children(new ArrayList<>(currentRecipe.content.keySet())).getOnce().onComplete(new FB.CompleteListener() {
+                    @Override
+                    public void onComplete(List<DataSnapshot> results) {
+                        data = new ArrayList<>();
+                        for (DataSnapshot s : results) {
+                            data.add(Content.from(s));
+                        }
+                        notifyDataSetChanged();
                     }
-                    notifyDataSetChanged();
-                }
-            });
+                });
         }
 
         @Override

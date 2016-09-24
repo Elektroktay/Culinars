@@ -26,6 +26,7 @@ import com.culinars.culinars.data.structure.Content;
 import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.data.structure.User;
 import com.google.firebase.database.DataSnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -65,17 +66,13 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
                 setUpTitle(holder, context, getDataAtPos(position).title);
             else
                 setUpTitle(holder, context, "Empty Title");
-            if (getImageAtPos(position) != null) {
-                setUpImageView(holder, getImageAtPos(position));
-                holder.cardLoading.setVisibility(View.INVISIBLE);
-            } else {
-                setUpImageView(holder, BitmapFactory.decodeResource(context.getResources(), R.drawable.gradient_black_horizontal));
-                holder.cardLoading.setVisibility(View.INVISIBLE);
-            }
+            holder.cardLoading.setVisibility(View.INVISIBLE);
+
+            setUpImageView(holder, getContentAtPos(position));
             setUpStars(holder, getDataAtPos(position).getStarsAverage());
             setUpCalories(holder, getDataAtPos(position).calories, "calories");
             setUpTime(holder, getDataAtPos(position).time);
-            User.loadCurrent().onGet(new FB.GetListener() {
+            User.current().onGet(new FB.GetListener() {
                 @Override
                 public void onDataChange(DataSnapshot s) {
                     User res = User.from(s);
@@ -103,7 +100,7 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
                     context.startActivity(intent);
                 }
             });
-            User.loadCurrent().onGet(new FB.GetListener() {
+            User.current().onGet(new FB.GetListener() {
                 @Override
                 public void onDataChange(DataSnapshot s) {
                     User res = User.from(s);
@@ -122,8 +119,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         }
     }
 
-    private void setUpImageView(ViewHolder holder, Bitmap bitmap) {
-        holder.imageView.setImageBitmap(bitmap);
+    private void setUpImageView(ViewHolder holder, Content content) {
+        if (content == null)
+            holder.imageView.setImageResource(R.drawable.gradient_black_horizontal);
+        else
+            Picasso.with(context).load(content.url).into(holder.imageView);
     }
 
     private void setUpTitle(ViewHolder holder, Context context, String title) {
@@ -263,7 +263,7 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
     }
 
     public abstract Recipe getDataAtPos(int position);
-    public abstract Bitmap getImageAtPos(int position);
+    public abstract Content getContentAtPos(int position);
 
     public abstract void onFavoriteClick(int adapterPosition, ImageView cardFavorite);
 

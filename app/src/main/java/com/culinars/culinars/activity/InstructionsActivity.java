@@ -18,6 +18,7 @@ import com.culinars.culinars.data.structure.Recipe;
 import com.culinars.culinars.fragment.recipe.InstructionsFragment;
 import com.google.firebase.database.DataSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InstructionsActivity extends AppCompatActivity {
@@ -33,7 +34,7 @@ public class InstructionsActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private Recipe currentRecipe;
-    private List<Instruction> instructions;
+    private List<Instruction> instructions = new ArrayList<>();
 
     /**
      * The {@link ViewPager} that will host the section contents.

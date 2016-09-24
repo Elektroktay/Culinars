@@ -40,7 +40,7 @@ public class RecommendationsFragment extends Fragment {
         RecommendationsFragment fragment = new RecommendationsFragment();
         fragment.isSearching = false;
         fragment.toolbar = toolbar;
-        fragment.adapter = new RecommendationsSearchAdapter();
+        fragment.adapter = new RecommendationsAdapter();
         return fragment;
     }
 
@@ -59,13 +59,13 @@ public class RecommendationsFragment extends Fragment {
 
     public void setSearching(boolean isSearching) {
         if (this.isSearching != isSearching) {
-/*            adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+            //adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
             if (isSearching)
                 adapter = new RecommendationsSearchAdapter();
             else
                 adapter = new RecommendationsAdapter();
-            recyclerView.setAdapter(null);
-            recyclerView.postDelayed(new Runnable() {
+            recyclerView.setAdapter(adapter);
+/*            recyclerView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     recyclerView.setAdapter(adapter);

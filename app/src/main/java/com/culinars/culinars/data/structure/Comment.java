@@ -60,7 +60,7 @@ public class Comment implements Data{
         if (uid == null || uid.length() == 0)
             uid = ((DatabaseReference)fb().comment().ref()).push().getKey();
         FB.Result request1 = fb().comment().child(uid).set(this);
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);

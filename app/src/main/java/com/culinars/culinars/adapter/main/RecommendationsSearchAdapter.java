@@ -1,6 +1,8 @@
 package com.culinars.culinars.adapter.main;
 
 
+import android.util.Log;
+
 import com.culinars.culinars.data.DM;
 import com.culinars.culinars.data.structure.Recipe;
 
@@ -15,7 +17,6 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
     boolean searchOnlyCurrentIngredients;
 
     int resultCount = 10;
-    List<Recipe> data;
 
     public void updateSearchParams(String searchQuery, int searchMaxTime, int searchMaxCalories, ArrayList<String> searchIngredients, String searchCuisine, boolean searchOnlyCurrentIngredients) {
         if (searchQuery.length() > 1) {
@@ -71,8 +72,9 @@ public class RecommendationsSearchAdapter extends RecommendationsAdapter {
 
     @Override
     public int getItemCount() {
+
         if (data != null)
-            return data.size()+1;
+            return data.size() + 1;
         else
             return 1;
     }

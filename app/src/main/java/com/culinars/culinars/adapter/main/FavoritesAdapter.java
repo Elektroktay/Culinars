@@ -31,7 +31,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
     }
 
     private void refreshData() {
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s1) {
                 User res = User.from(s1);

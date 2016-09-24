@@ -9,7 +9,7 @@ public class FavoritesAdapter2 extends RecommendationsAdapter {
 
     @Override
     public void refreshData() {
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);

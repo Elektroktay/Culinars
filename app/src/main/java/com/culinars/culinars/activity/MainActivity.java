@@ -46,6 +46,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
+/**
+ * The activity that includes recommendations, favorites and the fridge.
+ */
 public class MainActivity extends AppCompatActivity {
 
     public ImageView appLogo;
@@ -187,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (recommendationsFragment != null)
                     recommendationsFragment.setSearching(true);
+                else
+                    Log.d("recommendationsFragment", "onClick: fragment is null.");
                 MainActivity.this.setBackButtonAction(new Runnable() {
                     @Override
                     public void run() {
@@ -218,6 +223,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onClose() {
                 if (recommendationsFragment != null)
                     recommendationsFragment.setSearching(false);
+                else
+                    Log.d("recommendationsFragment", "onClick: fragment is null.");
                 MainActivity.this.setBackButtonAction(null);
                 MainActivity.this.appLogo.setVisibility(View.VISIBLE);
                 searchView.setLayoutParams(new android.support.v7.widget.Toolbar.LayoutParams(

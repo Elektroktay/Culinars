@@ -62,7 +62,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         final Ingredient current = data.get(position);
         if (current == null)
             return;
-        User.loadCurrent().onGet(new FB.GetListener() {
+        User.current().onGet(new FB.GetListener() {
             @Override
             public void onDataChange(DataSnapshot s) {
                 User res = User.from(s);
@@ -79,7 +79,7 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
             public void onClick(View v) {
                 final String ing = current.name;
                 if (ing != null && ing.length() > 0) {
-                    User.loadCurrent().onGet(new FB.GetListener() {
+                    User.current().onGet(new FB.GetListener() {
                         @Override
                         public void onDataChange(DataSnapshot s) {
                             User res = User.from(s);
