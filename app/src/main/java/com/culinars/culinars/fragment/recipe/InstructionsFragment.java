@@ -31,6 +31,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/**
+ * A Fragment that holds an instruction in a ViewPager.
+ */
 public class InstructionsFragment extends Fragment {
 
     private Instruction currentInstruction;
@@ -47,6 +50,9 @@ public class InstructionsFragment extends Fragment {
     public InstructionsFragment() {
     }
 
+    /**
+     * Creates a new InstructionsFragment. Use this instead of the constructor.
+     */
     public static InstructionsFragment newInstance(Instruction currentInstruction) {
         final InstructionsFragment fragment = new InstructionsFragment();
         fragment.currentInstruction = currentInstruction;
@@ -74,36 +80,14 @@ public class InstructionsFragment extends Fragment {
                     }
                 }
             });
-/*            DataManager.getInstance().getContent(currentInstruction.content_id)
-                .addOnDataReadyListener(new OnDataChangeListener<Content>() {
-                    @Override
-                    public void onDataChange(Content newValue, int event) {
-                        DataManager.getInstance().downloadContent(newValue, new DataManager.OnDownloadFinishedListener() {
-                            @Override
-                            public void onDownloadFinished(Object result) {
-                                if (result instanceof Bitmap) {
-                                    //It's an image
-                                    fragment.currentImage = (Bitmap) result;
-                                } else if (result instanceof String) {
-                                    //It's a video
-                                    fragment.currentImage = BitmapFactory.decodeResource(fragment.getResources(), R.drawable.pizza);
-                                    fragment.videoUrl = (String) result;
-                                }
-                                fragment.getFragmentManager().beginTransaction()
-                                        .detach(fragment).attach(fragment).commit(); //Refreshes fragment.
-                            }
-
-                            @Override
-                            public void onDownloadFailed(Exception e) {
-                                Log.w("DOWNLOAD", "Download failed.", e);
-                                fragment.setLoadingEnabled(false);
-                            }
-                        });
-                    }
-                });*/
         return fragment;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -198,6 +182,11 @@ public class InstructionsFragment extends Fragment {
         }
     }*/
 
+    /**
+     * Refreshes the pie chart (timer view) with the given parameters.
+     * @param current Amount of time passed so far. (Unit independent.)
+     * @param max Maximum amount of time. (Unit independent.)
+     */
     private void refreshData(int current, int max) {
         Log.w("REFRESH_DATA", "current:" + current + " max:" + max);
         ArrayList<PieEntry> entries = new ArrayList<>();

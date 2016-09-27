@@ -12,7 +12,9 @@ import com.culinars.culinars.R;
 import com.culinars.culinars.adapter.recipe.RecipeOthersAdapter;
 import com.culinars.culinars.data.structure.Recipe;
 
-
+/**
+ * A fragment that holds a RecyclerView containing similar recipes to the given one, in a ViewPager.
+ */
 public class RecipeOthersFragment extends Fragment {
     private Recipe currentRecipe;
 
@@ -20,6 +22,9 @@ public class RecipeOthersFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new RecipeOthersFragment. Use this instead of the constructor.
+     */
     public static RecipeOthersFragment newInstance(Recipe currentRecipe) {
         RecipeOthersFragment fragment = new RecipeOthersFragment();
         fragment.setCurrentRecipe(currentRecipe);
@@ -30,6 +35,11 @@ public class RecipeOthersFragment extends Fragment {
         this.currentRecipe = currentRecipe;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

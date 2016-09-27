@@ -37,7 +37,4 @@ public class Rational {
         return gcd(denom, num % denom);
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Rational(1.5));
-    }
 }

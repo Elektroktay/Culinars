@@ -15,6 +15,11 @@ import android.widget.TextView;
 import com.culinars.culinars.R;
 import com.culinars.culinars.data.structure.Recipe;
 
+/**
+ * An adapter that fills a RecyclerView with facts about the given recipe.
+ * @deprecated
+ */
+@Deprecated
 public class RecipeFactsAdapter extends RecyclerView.Adapter<RecipeFactsAdapter.ViewHolder> {
 
     private Recipe currentRecipe;

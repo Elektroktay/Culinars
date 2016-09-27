@@ -23,14 +23,7 @@ import java.util.List;
 
 public class InstructionsActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private Recipe currentRecipe;
@@ -41,6 +34,11 @@ public class InstructionsActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    /**
+     * This method runs before contents of layout xml are loaded to the screen.
+     * Loading the xml onto the screen should be done here.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,8 +109,7 @@ public class InstructionsActivity extends AppCompatActivity {
 
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * A {@link FragmentPagerAdapter} that fills a ViewPager with instructions of the current recipe.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -122,8 +119,6 @@ public class InstructionsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             return InstructionsFragment.newInstance(instructions.get(position));
         }
 

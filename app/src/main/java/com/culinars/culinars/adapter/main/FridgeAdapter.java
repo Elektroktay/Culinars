@@ -22,6 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An adapter that performs a search of ingredients from Firebase and fills a RecyclerView with the results.
+ */
 public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder> {
 
     Context context;
@@ -34,6 +37,12 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         refreshData("");
     }
 
+    /**
+     * Loads (inflates) an item's appropriate xml into the RecyclerView
+     * @param parent The parent ViewGroup
+     * @param viewType Type of this item (not used because there's only 1 type of item)
+     * @return A new ViewHolder containing the loaded xml.
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
@@ -42,6 +51,10 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         return new ViewHolder(v);
     }
 
+    /**
+     * Performs a search with the given string and updates UI with the results.
+     * @param completionText Search query text.
+     */
     private void refreshData(String completionText) {
         Ingredient.find(completionText, dataLimit).getOnce().onGet(new FB.GetListener() {
             @Override
@@ -57,6 +70,11 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         });
     }
 
+    /**
+     * Sets up an item in the RecyclerView
+     * @param holder ViewHolder holding the views of this item.
+     * @param position Position of the item in the list.
+     */
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Ingredient current = data.get(position);
@@ -100,12 +118,21 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         });
     }
 
+    /**
+     * Gives the number of items in this adapter.
+     * @return Number of items in this adapter.
+     */
     @Override
     public int getItemCount() {
         return data.size();
     }
 
+    /**
+     * Performs a search with the given query.
+     * @param searchQuery Query text.
+     */
     public void updateSearchParams(String searchQuery) {
+        //First letter of an ingredient should be uppercase.
         if (searchQuery.length() > 1) {
             String firstLetter = searchQuery.substring(0, 1);
             String rest = searchQuery.substring(1);
@@ -115,6 +142,9 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         }
     }
 
+    /**
+     * Contains the views of a single item.
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         CardView fridge_container;
         ImageView fridge_image, fridge_check;

@@ -26,7 +26,9 @@ import java.util.List;
 
 import static com.culinars.culinars.data.FB.fb;
 
-
+/**
+ * A fragment that contains a single content (image or video) in a ViewPager.
+ */
 public class SlideshowFragment extends Fragment {
 
     private Content currentContent;
@@ -36,6 +38,11 @@ public class SlideshowFragment extends Fragment {
     ProgressBar loadingBar;
     ImageView slideshowImage;
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,6 +68,9 @@ public class SlideshowFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Creates a new SlideshowFragment. Use this instead of the constructor.
+     */
     public static SlideshowFragment newInstance(final Content content) {
         final SlideshowFragment fragment = new SlideshowFragment();
         fragment.currentContent = content;
@@ -115,6 +125,10 @@ public class SlideshowFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Enables or disables the loading spinner.
+     * @param enabled true if loading should be enabled.
+     */
     public void setLoadingEnabled(boolean enabled) {
         if (loadingBar != null) {
             if (enabled)
@@ -124,6 +138,9 @@ public class SlideshowFragment extends Fragment {
         }
     }
 
+    /**
+     * An adapter that fills a PagerAdapter with the contents (images and videos) of a given recipe.
+     */
     public static class PagerAdapter extends FragmentPagerAdapter {
 
         List<Content> data = new ArrayList<>();
@@ -142,11 +159,20 @@ public class SlideshowFragment extends Fragment {
                 });
         }
 
+        /**
+         * Returns a fragment containing the content at the given position.
+         * @param position The position of the content.
+         * @return A fragment containing the content selected.
+         */
         @Override
         public Fragment getItem(int position) {
             return SlideshowFragment.newInstance(data.get(position));
         }
 
+        /**
+         * Gives the number of pages in this adapter.
+         * @return Number of pages.
+         */
         @Override
         public int getCount() {
             if (data != null)

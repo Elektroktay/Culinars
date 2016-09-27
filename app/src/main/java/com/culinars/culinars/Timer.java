@@ -2,6 +2,11 @@ package com.culinars.culinars;
 
 import java.util.ArrayList;
 
+/**
+ * A simple timer. Doesn't work well in Android. Use Android's timer instead.
+ * @deprecated
+ */
+@Deprecated
 public class Timer {
 
     private boolean countDown;

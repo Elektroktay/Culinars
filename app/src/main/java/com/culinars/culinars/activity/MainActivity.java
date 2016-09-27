@@ -77,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private FridgeFragment fridgeFragment;
 
+    /**
+     * This method runs before contents of layout xml are loaded to the screen.
+     * Loading the xml onto the screen should be done here.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,28 +102,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-/*
-        BlurView blurView = (BlurView) findViewById(R.id.blurView);
-        blurView.setupWith(getWindow().getDecorView().findViewById(android.R.id.content))
-                .windowBackground(getWindow().getDecorView().getBackground())
-                .blurAlgorithm(new StackBlur(true))
-                .blurRadius(1);*/
-
-        //ViewPager setup
-        /*
-      The {@link android.support.v4.view.PagerAdapter} that will provide
-      fragments for each of the sections. We use a
-      {@link FragmentPagerAdapter} derivative, which will keep every
-      loaded fragment in memory. If this becomes too memory intensive, it
-      may be best to switch to a
-      {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+        //Pager adapter setup
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(pagerAdapter);
         mViewPager.addOnPageChangeListener(new MainPageChangeListener(toolbar, appBarLayout,
                 (FrameLayout) findViewById(R.id.search_extra_major_container)));
 
+        /**
+         * This OnClickListener finds the current fragment using black magic
+         * and scrolls its RecyclerView up.
+         */
         class AppIconClickListener implements View.OnClickListener{
             ViewPager viewPager;
             FragmentPagerAdapter adapter;
@@ -152,38 +146,16 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(1).setIcon(R.drawable.heart);
         tabLayout.getTabAt(2).setIcon(R.drawable.refrigerator_512);
 
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
+
 
         //SearchSetup
-
-
-
-
-
-
         setUpSearchExtra();
-        //Drawer etup
-//        final FrameLayout drawer = (FrameLayout) findViewById(R.id.main_drawer);
-//        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-/*        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(drawer);
-            }
-        });*/
-
     }
 
+    /**
+     * Sets up the interaction between the search bar and the extra parameters, the animations and search functionality.
+     * A lot of shit happens here. I can't bother commenting them all.
+     */
     private void setUpSearchExtra() {
         searchView.setOnSearchClickListener(new OnClickListener() {
             @Override
@@ -391,7 +363,12 @@ public class MainActivity extends AppCompatActivity {
         ingredientsText.setAdapter(ingredientAdapter);
     }
 
+    /**
+     * Begins a search with appropriate search params.
+     */
     private void updateSearchParams() {
+        //On the recommendations page this will set up a recipe search,
+        //and on the fridge page an ingredient search.
         if (mViewPager.getCurrentItem() < 2) {
             if (recommendationsFragment != null)
                 recommendationsFragment.searchWith(
@@ -405,6 +382,10 @@ public class MainActivity extends AppCompatActivity {
             fridgeFragment.searchWith(searchQuery);
     }
 
+    /**
+     * Expands extra search params with animation.
+     * @param durationInMilis How long the animation should last, in miliseconds.
+     */
     public void searchExtraExpand(int durationInMilis) {
         searchExtra.animate()
                 .translationY(-7)
@@ -422,6 +403,10 @@ public class MainActivity extends AppCompatActivity {
         transitionAppBar.startTransition(durationInMilis);
     }
 
+    /**
+     * Contracts extra search params with animation.
+     * @param durationInMilis How long the animation should last, in miliseconds.
+     */
     public void searchExtraContract(int durationInMilis) {
         searchExtra.animate()
                 .translationY(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -240, getResources().getDisplayMetrics()))
@@ -439,11 +424,17 @@ public class MainActivity extends AppCompatActivity {
         transitionAppBar.reverseTransition(durationInMilis);
     }
 
+    /**
+     * Tells whether extra search parameters are expanded or not.
+     * @return true if expanded.
+     */
     public boolean searchExtraIsExpanded() {
         return searchExtra.getTranslationY() >= -7;
     }
 
-
+    /**
+     * Sets up the options menu.
+     */
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -458,26 +449,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        /*
-        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
-        final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.d("MENU_SEARCH", "SearchOnQueryTextSubmit: " + query);
-                if( ! searchView.isIconified()) {
-                    searchView.setIconified(true);
-                }
-                myActionMenuItem.collapseActionView();
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String s) {
-                // UserFeedback.show( "SearchOnQueryTextChanged: " + s);
-                return false;
-            }
-        });
-        */
         return true;
     }
 
@@ -489,23 +460,6 @@ public class MainActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_user));
         popup.inflate(R.menu.menu_user);
         popup.show();
-        MenuItem loginItem = popup.getMenu().findItem(R.id.user_login);
-/*        loginItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                FirebaseAuth.getInstance().signInAnonymously();
-                return false;
-            }
-        });
-
-        MenuItem logoutItem = popup.getMenu().findItem(R.id.user_register);
-        logoutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                FirebaseAuth.getInstance().signOut();
-                return false;
-            }
-        });*/
     }
 
     @Override
@@ -527,6 +481,10 @@ public class MainActivity extends AppCompatActivity {
         this.backButtonAction = runnable;
     }
 
+    /**
+     * Is called when the back button is pressed. We're overriding this to provide functionality
+     * other than the default in some cases.
+     */
     @Override
     public void onBackPressed() {
         if (backButtonAction == null) {
@@ -540,8 +498,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * Adapter that controls the Pager containing recommendations, favorites and the fridge.
      */
     public class PagerAdapter extends FragmentPagerAdapter {
 
@@ -549,6 +506,11 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
+        /**
+         * Returns the appropriate fragment for the given page number.
+         * @param position Page number
+         * @return Fragment
+         */
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -562,6 +524,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Tells the number of pages in this pager
+         * @return number of pages
+         */
         @Override
         public int getCount() {
             // Show 3 total pages.

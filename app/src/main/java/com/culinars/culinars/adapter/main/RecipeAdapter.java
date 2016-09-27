@@ -30,12 +30,21 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/**
+ * A general adapter that fills a RecyclerView with any list of recipes.
+ * extend this class to provide data.
+ */
 public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> {
 
     Context context;
     ViewGroup parent;
-    ArrayList<Content> contents;
 
+    /**
+     * Loads (inflates) an item's appropriate xml into the RecyclerView, depending on its viewType.
+     * @param parent The parent ViewGroup
+     * @param viewType Result of calling getItemViewType(position) on the current position.
+     * @return A new ViewHolder containing the loaded xml.
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
@@ -51,6 +60,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         return new ViewHolder(v);
     }
 
+    /**
+     * Shows which type of item should be contained in a given position
+     * @param position Position to be checked
+     * @return Type of item.
+     */
     @Override
     public int getItemViewType(int position) {
         if (position == getItemCount()-1)
@@ -59,6 +73,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
             return 0;
     }
 
+    /**
+     * Sets up an item in the RecyclerView
+     * @param holder ViewHolder holding the views of this item.
+     * @param position Position of the item in the list.
+     */
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         if (getItemViewType(position) == 0 && getDataAtPos(position) != null) {
@@ -119,6 +138,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         }
     }
 
+    /**
+     * Sets up the image of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param content Content to be shown.
+     */
     private void setUpImageView(ViewHolder holder, Content content) {
         if (content == null)
             holder.imageView.setImageResource(R.drawable.gradient_black_horizontal);
@@ -126,12 +150,23 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
             Picasso.with(context).load(content.url).into(holder.imageView);
     }
 
+    /**
+     * Sets up the title view of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param context Any context.
+     * @param title Title to be shown.
+     */
     private void setUpTitle(ViewHolder holder, Context context, String title) {
         holder.titleView.setText(title);
         AssetManager am = context.getApplicationContext().getAssets();
         holder.titleView.setTypeface(Typeface.createFromAsset(am, "fonts/segoe_ui_light.ttf"));
     }
 
+    /**
+     * Sets up the stars view of this card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param points Amount of points to be shown. 1 point is half a star. Max 10 points.
+     */
     private void setUpStars(ViewHolder holder, int points) {
         for (ImageView img : holder.stars) {
             if (points > 1) {
@@ -146,6 +181,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         }
     }
 
+    /**
+     * Sets up the difficulty view of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param difficultyScale Scale of difficulty between 0 and 2. 0 - easy, 2 - hard
+     */
     private void setUpDifficulty(ViewHolder holder, int difficultyScale) {
         String difficulty = "";
         switch (difficultyScale) {
@@ -156,12 +196,23 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         holder.cardDifficultyText.setText(difficulty);
     }
 
+    /**
+     * Sets up the ingredients view of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param value Number of ingredients user has.
+     * @param maxIngredients Number of ingredients recipe requires.
+     */
     private void setUpIngredients(ViewHolder holder, int value, int maxIngredients) {
         holder.cardIngredientValue1.setText(""+value);
         holder.cardIngredientValue2.setText(""+maxIngredients);
         holder.cardIngredientUnit.setText("ingredients");
     }
 
+    /**
+     * Sets up the time view of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param value Amount of time in minutes.
+     */
     private void setUpTime(ViewHolder holder, int value) {
         if (value > 59) {
             if (value%60 < 10)
@@ -175,11 +226,21 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         }
     }
 
+    /**
+     * Sets up the calories view of the card.
+     * @param holder ViewHolder holding the views of this item.
+     * @param value Amount of calories
+     * @param unit Unit of the calories
+     */
     private void setUpCalories(ViewHolder holder, int value, String unit) {
         holder.cardCaloriesValue.setText("" + value);
         holder.cardCaloriesUnit.setText(unit);
     }
 
+    /**
+     * Toggles the opened state of the card.
+     * @param holder ViewHolder holding the views of this item.
+     */
     private void flipCard(ViewHolder holder) {
         if (holder.cardFrontContainer.getTranslationY() > holder.cardFrontContainer.getHeight() * -0.5) {
             openCard(holder);
@@ -188,7 +249,11 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
         }
     }
 
-    //Front goes down.
+
+    /**
+     * Shows the closing animation of the card.
+     * @param holder ViewHolder holding the views of this item.
+     */
     public void closeCard(final ViewHolder holder) {
         holder.titleView.setSingleLine(false);
         holder.cardFrontContainer.animate()
@@ -224,7 +289,10 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
                 .start();
     }
 
-    //Front goes up.
+    /**
+     * Shows the opening animation of the card.
+     * @param holder ViewHolder holding the views of this item.
+     */
     public void openCard(final ViewHolder holder) {
         holder.titleView.setSingleLine(true);
         holder.cardBackContainer.setVisibility(View.VISIBLE);
@@ -267,6 +335,9 @@ public abstract class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.V
 
     public abstract void onFavoriteClick(int adapterPosition, ImageView cardFavorite);
 
+    /**
+     * Holds all the views of a single item in the RecyclerView.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView imageView, logoView;
         public ImageView[] stars;

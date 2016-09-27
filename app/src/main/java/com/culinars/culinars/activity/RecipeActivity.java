@@ -32,7 +32,12 @@ public class RecipeActivity extends AppCompatActivity {
     Recipe currentRecipe;
 
 
-
+    /**
+     *     /**
+     * This method runs before contents of layout xml are loaded to the screen.
+     * Loading the xml onto the screen should be done here.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,13 +77,6 @@ public class RecipeActivity extends AppCompatActivity {
         bottomSheetBehavior.setPeekHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300+70, getResources().getDisplayMetrics()));
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-/*        bottomSheet.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                buttonSlideContainer.setTranslationY(scrollY);
-            }
-        });*/
-
         CardView cookButton = (CardView) findViewById(R.id.recipe_cook_button);
         cookButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,12 +89,20 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * An adapter that fills a viewPager with Ingredients, Facts and Similar Recipes pages.
+     */
     private class PagerAdapter extends FragmentPagerAdapter {
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        /**
+         * Returns the appropriate page for the given page number
+         * @param position The page number
+         * @return The page, or null if page number is invalid.
+         */
         @Override
         public Fragment getItem(int position) {
             switch (position) {
@@ -107,11 +113,20 @@ public class RecipeActivity extends AppCompatActivity {
             return null;
         }
 
+        /**
+         * Gives the number of pages in this adapter.
+         * @return Number of pages.
+         */
         @Override
         public int getCount() {
             return 3;
         }
 
+        /**
+         * Returns the page title of the given position
+         * @param position The position of the page.
+         * @return The title.
+         */
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {

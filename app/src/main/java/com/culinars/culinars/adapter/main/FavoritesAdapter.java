@@ -19,6 +19,10 @@ import com.google.firebase.database.DataSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An adapter that fills a RecyclerView with a menu for navigating the user's favorites.
+ * Contains options "All Favorites", "Drinks", "Deserts", "Dinners" and "Breakfasts"
+ */
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.ViewHolder> {
 
     Context context;
@@ -30,6 +34,9 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         refreshData();
     }
 
+    /**
+     * Downloads new information from Firebase and updates UI accordingly.
+     */
     private void refreshData() {
         User.current().onGet(new FB.GetListener() {
             @Override
@@ -50,6 +57,12 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         });
     }
 
+    /**
+     * Loads (inflates) an item's appropriate xml into the RecyclerView
+     * @param parent The parent ViewGroup
+     * @param viewType Type of this item (not used because there's only 1 type of item)
+     * @return A new ViewHolder containing the loaded xml.
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
@@ -58,6 +71,11 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         return new ViewHolder(v);
     }
 
+    /**
+     * Sets up an item in the RecyclerView
+     * @param holder ViewHolder holding the views of this item.
+     * @param position Position of the item in the list.
+     */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (position == 0 && data != null)
@@ -92,11 +110,18 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         }
     }
 
+    /**
+     * Gives the number of items in this adapter.
+     * @return Number of items in this adapter.
+     */
     @Override
     public int getItemCount() {
         return 5;
     }
 
+    /**
+     * Contains the views of a single item.
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         CardView favorite_container;
         ImageView favorite_image;

@@ -17,7 +17,7 @@ import com.culinars.culinars.adapter.main.RecommendationsSearchAdapter;
 import java.util.ArrayList;
 
 /**
- * Created by Oktayşen on 19/6/2016.
+ * A Fragment that holds the recommendations page in a PagerAdapter.
  */
 public class RecommendationsFragment extends Fragment {
     /**
@@ -33,10 +33,9 @@ public class RecommendationsFragment extends Fragment {
     }
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Creates a new RecommendationsFragment. Use this instead of the constructor.
      */
-    public static RecommendationsFragment newInstance( Toolbar toolbar) {
+    public static RecommendationsFragment newInstance(Toolbar toolbar) {
         RecommendationsFragment fragment = new RecommendationsFragment();
         fragment.isSearching = false;
         fragment.toolbar = toolbar;
@@ -44,6 +43,11 @@ public class RecommendationsFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,6 +61,10 @@ public class RecommendationsFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Sets the searching mode of this fragment, by supplying the appropriate fragment to its RecyclerView.
+     * @param isSearching Should this fragment be in searching mode?
+     */
     public void setSearching(boolean isSearching) {
         if (this.isSearching != isSearching) {
             //adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
@@ -76,6 +84,15 @@ public class RecommendationsFragment extends Fragment {
         }
     }
 
+    /**
+     * If in search mode, executes a search with the given parameters.
+     * @param searchQuery Query text to be searched for. Set to null or "" if not a parameter.
+     * @param searchMaxTime Maximum amount of time the recipes can take in minutes. -1 if not a parameter.
+     * @param searchMaxCalories Maximum amount of calories recipes can have. -1 if not a parameter.
+     * @param searchIngredients List of ingredients recipes should contain. null or empty list if not a parameter. (Not implemented)
+     * @param searchCuisine The cuisine recipes should be a part of. null or "" if not a parameter.
+     * @param searchOnlyCurrentIngredients true if recipes should only contain ingredients that are in the fridge. (Not implemented.)
+     */
     public void searchWith(String searchQuery, int searchMaxTime, int searchMaxCalories, ArrayList<String> searchIngredients, String searchCuisine, boolean searchOnlyCurrentIngredients) {
         if (adapter instanceof RecommendationsSearchAdapter)
             ((RecommendationsSearchAdapter) adapter).updateSearchParams(searchQuery, searchMaxTime, searchMaxCalories, searchIngredients, searchCuisine, searchOnlyCurrentIngredients);

@@ -54,6 +54,11 @@ public class SplashActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
 
 
+    /**
+     * This method runs before contents of layout xml are loaded to the screen.
+     * Loading the xml onto the screen should be done here.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -64,103 +69,46 @@ public class SplashActivity extends AppCompatActivity {
         //Load xml to the screen.
         setContentView(R.layout.activity_splash);
 
+        //Initialize various views.
         wrapper = (FrameLayout) findViewById(R.id.wrapper);
         logo = (ImageView) findViewById(R.id.splash_logo);
-        logo.setTranslationY(0);
+        logo.setTranslationY(0); //Make sure logo is in the center of the screen.
         loginWrapper = (FrameLayout) findViewById(R.id.login_wrapper);
-        loginWrapper.setVisibility(View.INVISIBLE);
-        loginWrapper.setTranslationY(dpToPx(250));
+        loginWrapper.setVisibility(View.INVISIBLE); //Make login options invisible.
+        loginWrapper.setTranslationY(dpToPx(250)); //Translate login options out of the screen.
 
+        //Initialize loginPager which contains login, login options and register, in that order.
         loginPager = (ViewPager) findViewById(R.id.login_pager);
         loginPager.setOffscreenPageLimit(3);
         loginPager.setAdapter(new SplashLoginAdapter(getSupportFragmentManager(), this));
         loginPager.setCurrentItem(1);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-/*        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-                    }
-                })
-                //.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();*/
-
-/*
-        DataManager.getInstance().init(DataManager.getAuthStateListener(new Runnable() {
-            @Override
-            public void run() {
-                //Is logged in.
-                User.create(getCurrentUser().getUid());
-                User.current();
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                //Is logged out.
-                //Toast.makeText(activity, "LOGGED OUT", Toast.LENGTH_SHORT).show();
-                auth.signInAnonymously()
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (!task.isComplete()) {
-                                    //Toast.makeText(activity, "ANONYMOUS LOGIN FAILURE", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                //Toast.makeText(activity, "ANONYMOUS LOGIN SUCCESS", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        }));
-
-        DataManager.getInstance().login();
-        Log.w("SPLASH_ACT", "1");
-        DataManager.getInstance().addOnLoginListener(new DataListener() {
-            @Override
-            public void onDataChange(Object newValue, int event) {
-                Log.w("SPLASH_ACT", "2");
-                User.current().addListener(new DataListener<User>() {
-                    @Override
-                    public void onDataChange(User newValue, int event) {
-                        Log.w("SPLASH_ACT", "3");
-                        if (newValue == null) {
-                            Log.w("SPLASH_ACT", "4");
-                            startApp();
-                            return;
-                        }
-                        RefMultiple<Recipe> recommendations = newValue.getRecommendations(0, 10);
-                        if (recommendations != null)
-                            recommendations.addListener(new DataListener<Recipe>() {
-                                @Override
-                                public void onDataChange(Recipe newValue, int event) {
-                                    Log.w("SPLASH_ACT", "5");
-                                    startApp();
-                                }
-                            });
-                    }
-                });
-            }
-        });*/
     }
 
+    /**
+     * Checks if given text is a valid password.
+     * @param text Text to be checked.
+     * @return true if valid.
+     */
     public static boolean passwordIsValid(CharSequence text) {
         String passwordRegex = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})";
         return !TextUtils.isEmpty(text)
                 && Pattern.compile(passwordRegex).matcher(text).matches();
-        //return text.length() > 6;
     }
 
+    /**
+     * Checks if given text is a valid email.
+     * @param text Text to be checked.
+     * @return true if valid.
+     */
     public static boolean emailIsValid(CharSequence text) {
         return !TextUtils.isEmpty(text)
                 && android.util.Patterns.EMAIL_ADDRESS.matcher(text).matches();
     }
 
-
+    /**
+     * Applies shaking animation to the given view.
+     * @param view View to be shaked.
+     */
     public static void shakeView(View view) {
         ObjectAnimator
                 .ofFloat(view, "translationX", 0, 25, -25, 25, -25, 15, -15, 6, -6, 0)
@@ -168,12 +116,9 @@ public class SplashActivity extends AppCompatActivity {
                 .start();
     }
 
-/*    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        animateLogin();
-    }*/
-
+    /**
+     * Defines which action the back button will take.
+     */
     @Override
     public void onBackPressed() {
         if (loginPager.getCurrentItem() == 1)
@@ -183,9 +128,13 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method runs after views are properly loaded.
+     */
     @Override
     protected void onStart() {
         super.onStart();
+        //Creates a new user if user doesn't exist in the database. Starts app if otherwise.
          signInAction = new Runnable() {
             @Override
             public void run() {
@@ -203,6 +152,7 @@ public class SplashActivity extends AppCompatActivity {
                         } else {
                             if (signInAction != null) {
                                 startApp();
+                                //Self destruct mechanism.
                                 FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
                                 signInAction = null;
                             }
@@ -212,6 +162,7 @@ public class SplashActivity extends AppCompatActivity {
             }
         };
 
+        //If user isn't signed in, signs in anonymously. If user is signed in, calls signInAction.
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -230,101 +181,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         };
 
+        //Activates authStateListener.
         FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
-/*
-        Log.w("SPLASH", "1");
-        final FirebaseAuth.AuthStateListener authStateListener1 = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                    animateLogin();
-                } else {
-                    Log.w("SPLASH", "2, " + FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                        Log.w("SPLASH", "3");
-                        User.current().addListener(new DataListener<User>() {
-                            @Override
-                            public void onDataChange(User newValue, int event) {
-                                Log.w("SPLASH", "4" + (newValue == null));
-                                if (newValue == null) {
-                                    //FirebaseAuth.getInstance().signOut();
-                                    User u;
-                                    if (FirebaseAuth.getInstance().getCurrentUser().getEmail() == null)
-                                        u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", "");
-                                    else
-                                        u = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(), "", FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                                    u.save(new DataListener<User>() {
-                                        @Override
-                                        public void onDataChange(User newValue, int event) {
-                                            User.current().addListener(new DataListener<User>() {
-                                                @Override
-                                                public void onDataChange(User newValue, int event) {
-                                                    Log.w("SPLASH", "5");
-                                                    RefMultipleFromKeys<Recipe> recommendations = newValue.getRecommendations(0, 10);
-                                                    if (recommendations != null) {
-                                                        recommendations.addFinishedListener(new DataListener<Recipe>() {
-                                                            @Override
-                                                            public void onDataChange(Recipe newValue, int event) {
-                                                                Log.w("SPLASH", "6");
-                                                                startApp();
-                                                            }
-                                                        });
-                                                    } else {
-                                                        Log.w("SPLASH", "7");
-                                                        startApp();
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    Log.w("SPLASH", "5");
-                                    RefMultipleFromKeys<Recipe> recommendations = newValue.getRecommendations(0, 10);
-                                    if (recommendations != null) {
-                                        recommendations.addFinishedListener(new DataListener<Recipe>() {
-                                            @Override
-                                            public void onDataChange(Recipe newValue, int event) {
-                                                Log.w("SPLASH", "6");
-                                                startApp();
-                                            }
-                                        });
-                                    } else {
-                                        Log.w("SPLASH", "7");
-                                        startApp();
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        Log.w("LOGIN", "currentUser is null");
-                    }
-                }
-            }
-        };*/
-
-/*        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    startApp();
-                }
-            }
-        });
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                @Override
-                public void onSuccess(AuthResult authResult) {
-                    startApp();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(SplashActivity.this, "Login Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            startApp();
-        }*/
     }
 
     /**
@@ -354,19 +212,6 @@ public class SplashActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
-/*
-    private void addTask(final Reference ref) {
-        tasks.add(ref);
-        ref.addListener(new DataListener() {
-            @Override
-            public void onDataChange(Object newValue, int event) {
-                tasks.remove(ref);
-                if (tasks.isEmpty()) {
-
-                }
-            }
-        });
-    }*/
 
     /**
      * Converts dp to px.

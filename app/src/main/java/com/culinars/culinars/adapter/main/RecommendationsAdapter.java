@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * A RecipeAdapter containing the recommendations of a user.
+ */
 public class RecommendationsAdapter extends RecipeAdapter {
 
     int resultCount;
@@ -35,6 +37,11 @@ public class RecommendationsAdapter extends RecipeAdapter {
         refreshData();
     }
 
+    /**
+     * Returns a Recipe for the given position.
+     * @param position Position of the recipe
+     * @return The recipe, or null if data isn't ready yet.
+     */
     @Override
     public Recipe getDataAtPos(int position) {
         if (data != null)
@@ -43,6 +50,11 @@ public class RecommendationsAdapter extends RecipeAdapter {
             return null;
     }
 
+    /**
+     * Returns the appropriate content (image or video) for the recipe in the given position.
+     * @param position Position of the recipe
+     * @return The content, or null if data isn't ready yet.
+     */
     @Override
     public Content getContentAtPos(int position) {
         try {
@@ -58,6 +70,11 @@ public class RecommendationsAdapter extends RecipeAdapter {
     }
 
 
+    /**
+     * Adds the recipe in the given position to the favorites of the current user.
+     * @param position Position of the recipe
+     * @param cardFavorite The heart image that will be changed once the task is complete.
+     */
     @Override
     public void onFavoriteClick(final int position, final ImageView cardFavorite) {
         User.current().onGet(new FB.GetListener() {
@@ -86,7 +103,9 @@ public class RecommendationsAdapter extends RecipeAdapter {
         });*/
     }
 
-
+    /**
+     * Downloads new data from Firebase and updates the UI accordingly when data is ready.
+     */
     public void refreshData() {
         User.current().onGet(new FB.GetListener() {
             @Override
@@ -100,6 +119,10 @@ public class RecommendationsAdapter extends RecipeAdapter {
         });
     }
 
+    /**
+     * Updates the current data with the new one from database and updates UI accordingly.
+     * @return
+     */
     public FB.CompleteListener getListener() {
         return new FB.CompleteListener() {
             @Override
@@ -128,12 +151,16 @@ public class RecommendationsAdapter extends RecipeAdapter {
                             });
                         }
                     }
-                    notifyDataSetChanged();
+                    notifyDataSetChanged(); //Update ui.
                 }
             }
         };
     }
 
+    /**
+     * Gives the number of items in this adapter.
+     * @return Number of items in this adapter.
+     */
     @Override
     public int getItemCount() {
         if (data != null)

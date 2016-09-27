@@ -24,6 +24,9 @@ public class RecipeIngredientsFragment extends Fragment {
         this.currentRecipe = currentRecipe;
     }
 
+    /**
+     * Creates a new RecipeIngredientsFragment. Use this instead of the constructor.
+     */
     public static RecipeIngredientsFragment newInstance(Recipe currentRecipe) {
         RecipeIngredientsFragment fragment = new RecipeIngredientsFragment();
         fragment.setCurrentRecipe(currentRecipe);
@@ -35,6 +38,11 @@ public class RecipeIngredientsFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

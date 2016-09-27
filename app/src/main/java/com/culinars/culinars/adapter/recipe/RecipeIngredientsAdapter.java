@@ -30,6 +30,9 @@ import java.util.Map;
 
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
+/**
+ * An adapter that fills a RecyclerView with the ingredients of a given recipe.
+ */
 public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredientsAdapter.ViewHolder> {
 
     Context context;
@@ -38,7 +41,12 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
     int servings;
     Map<String, Ingredient> ingredientMap;
     ArrayList<Integer> selectedValues;
+    private double p;
 
+    /**
+     * Initializes the adapter with ingredients from the given recipe.
+     * @param currentRecipe The recipe in question.
+     */
     public RecipeIngredientsAdapter(Recipe currentRecipe) {
         servings = 1;
         this.currentRecipe = currentRecipe;
@@ -63,6 +71,12 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
         }
     }
 
+    /**
+     * Loads (inflates) an item's appropriate xml into the RecyclerView, depending on its viewType.
+     * @param parent The parent ViewGroup
+     * @param viewType Result of calling getItemViewType(position) on the current position.
+     * @return A new ViewHolder containing the loaded xml.
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
@@ -78,6 +92,11 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
         return new ViewHolder(v);
     }
 
+    /**
+     * Shows which type of item should be contained in a given position
+     * @param position Position to be checked
+     * @return Type of item.
+     */
     @Override
     public int getItemViewType(int position) {
         if (position == getItemCount()-1)
@@ -86,8 +105,13 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             return 0;
     }
 
+    /**
+     * Sets up an item in the RecyclerView
+     * @param holder ViewHolder holding the views of this item.
+     * @param position Position of the item in the list.
+     */
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         if (getItemViewType(position) == 0) {
             holder.ingredients_title.setText(ingredients.get(position));
 
@@ -116,7 +140,7 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
                 public void onDataChange(DataSnapshot s) {
                     User res = User.from(s);
                     if (res != null) {
-                        if (res.hasIngredient(ingredients.get(position))) {
+                        if (res.hasIngredient(ingredients.get(holder.getAdapterPosition()))) {
                             holder.ingredients_title.setTextColor(Color.WHITE);
                             holder.ingredients_value_1.setTextColor(Color.WHITE);
                             holder.ingredients_value_2.setTextColor(Color.WHITE);
@@ -128,8 +152,8 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
                             holder.ingredients_value_1.setTextColor(Color.parseColor("#B91010"));
                             holder.ingredients_value_2.setTextColor(Color.parseColor("#B91010"));
 
-                            if (ingredientMap.containsKey(ingredients.get(position))) {
-                                double price = (double) (ingredientMap.get(ingredients.get(position)).price * servings) / 100;
+                            if (ingredientMap.containsKey(ingredients.get(holder.getAdapterPosition()))) {
+                                double price = (double) (ingredientMap.get(ingredients.get(holder.getAdapterPosition())).price * servings) / 100;
                                 Log.w("PRICE", price + "");
                                 DecimalFormat df = new DecimalFormat("0.00");
                                 holder.ingredients_value_1.setText("$" + df.format(price));
@@ -157,12 +181,12 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             holder.ingredients_container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (selectedValues.contains(position)) {
-                        selectedValues.remove(Integer.valueOf(position));
+                    if (selectedValues.contains(holder.getAdapterPosition())) {
+                        selectedValues.remove(Integer.valueOf(holder.getAdapterPosition()));
                     } else {
-                        selectedValues.add(position);
+                        selectedValues.add(holder.getAdapterPosition());
                     }
-                    notifyItemChanged(position);
+                    notifyItemChanged(holder.getAdapterPosition());
                     notifyItemChanged(getItemCount()-1);
                 }
             });
@@ -224,6 +248,10 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
         //holder.ingredients_checkbox.setChecked(position%2==0);
     }
 
+    /**
+     * Gives the number of items in this adapter.
+     * @return Number of items in this adapter.
+     */
     @Override
     public int getItemCount() {
         if (currentRecipe.ingredients != null)
@@ -232,6 +260,9 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
             return 0;
     }
 
+    /**
+     * Holds all the views of a single item in the RecyclerView.
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         CardView ingredients_card;
         ImageView ingredients_image, ingredients_check;

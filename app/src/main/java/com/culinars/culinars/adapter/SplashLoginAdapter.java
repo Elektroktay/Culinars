@@ -30,6 +30,12 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import in.championswimmer.libsocialbuttons.buttons.BtnFacebook;
 
+import static com.culinars.culinars.activity.SplashActivity.shakeView;
+
+/**
+ * Manages loginPager in SplashActivity.
+ * @see SplashActivity#onCreate
+ */
 public class SplashLoginAdapter extends FragmentPagerAdapter {
     private SplashActivity activity;
     private AppCompatEditText loginEmail;
@@ -49,6 +55,11 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
         this.activity = splashActivity;
     }
 
+    /**
+     * Returns a fragment for the appropriate page.
+     * @param position Page number
+     * @return Appropriate Fragment, or null if page number is invalid.
+     */
     @Override
     public Fragment getItem(int position) {
         switch (position) {
@@ -59,13 +70,19 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
         return null;
     }
 
+    /**
+     * Returns how many pages there are in total.
+     * @return Number of pages.
+     */
     @Override
     public int getCount() {
         return 3;
     }
 
 
-
+    /**
+     * Manages the login page of the loginPager.
+     */
     public static class LoginFragment extends Fragment {
         SplashLoginAdapter adapter;
         public static LoginFragment newInstance(@NonNull SplashLoginAdapter adapter) {
@@ -73,6 +90,10 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
             fragment.adapter = adapter;
             return fragment;
         }
+
+        /**
+         * Runs before xml is loaded onto the screen. Loading the xml (aka inflating) is done here.
+         */
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_login, container, false);
@@ -80,22 +101,23 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
             adapter.loginPassword = (AppCompatEditText) rootView.findViewById(R.id.login_password);
             adapter.loginButton = (AppCompatButton) rootView.findViewById(R.id.login_button);
 
+            //When loginButton is clicked, check the validity of the credentials and try logging in.
             adapter.loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String email = adapter.loginEmail.getText().toString();
                     String password = adapter.loginPassword.getText().toString();
                     if (!SplashActivity.emailIsValid(email)) {
-                        SplashActivity.shakeView(adapter.loginEmail);
-                        SplashActivity.shakeView(adapter.loginPassword);
+                        shakeView(adapter.loginEmail);
+                        shakeView(adapter.loginPassword);
                         return;
                     }
                     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    SplashActivity.shakeView(adapter.loginEmail);
-                                    SplashActivity.shakeView(adapter.loginPassword);
+                                    shakeView(adapter.loginEmail);
+                                    shakeView(adapter.loginPassword);
                                 }
                             });
                 }
@@ -104,6 +126,9 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
         }
     }
 
+    /**
+     * Manages the loginOptions page in loginPager.
+     */
     public static class LoginOptionsFragment extends Fragment {
         SplashLoginAdapter adapter;
         public static LoginOptionsFragment newInstance(@NonNull SplashLoginAdapter adapter) {
@@ -111,6 +136,8 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
             fragment.adapter = adapter;
             return fragment;
         }
+
+        //TODO: Implement login with Facebook & Google
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_login_options, container, false);
@@ -149,6 +176,9 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
         }
     }
 
+    /**
+     * Manages the register page in loginPager.
+     */
     public static class RegisterFragment extends Fragment {
         SplashLoginAdapter adapter;
         public static RegisterFragment newInstance(@NonNull SplashLoginAdapter adapter) {
@@ -162,6 +192,8 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
             adapter.registerEmail = (AppCompatEditText) rootView.findViewById(R.id.register_email);
             adapter.registerPassword = (AppCompatEditText) rootView.findViewById(R.id.register_password);
             adapter.registerButton = (AppCompatButton) rootView.findViewById(R.id.register_button);
+
+            //As text changes, check validity and show an error if necessary.
             adapter.registerEmail.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -179,6 +211,7 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
                 public void afterTextChanged(Editable editable) {}
             });
 
+            //As text changes, check validity and show an error if necessary.
             adapter.registerPassword.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -196,7 +229,7 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
                 public void afterTextChanged(Editable editable) {}
             });
 
-
+            //Check validity one last time and if valid, try registering.
             adapter.registerButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -205,11 +238,11 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
                     final String password = adapter.registerPassword.getText().toString();
 
                     if (!SplashActivity.emailIsValid(email)) {
-                        SplashActivity.shakeView(adapter.registerEmail);
+                        shakeView(adapter.registerEmail);
                         return;
                     }
                     if (!SplashActivity.passwordIsValid(password)) {
-                        SplashActivity.shakeView(adapter.registerPassword);
+                        shakeView(adapter.registerPassword);
                         return;
                     }
 
@@ -225,7 +258,7 @@ public class SplashLoginAdapter extends FragmentPagerAdapter {
                             Log.w("SIGN_UP", "Failure", e);
                             if (e.getMessage().equalsIgnoreCase("The email address is already in use by another account.")) {
                                 adapter.registerEmail.setError("This email address is already in use by another account.");
-                                SplashActivity.shakeView(adapter.registerEmail);
+                                shakeView(adapter.registerEmail);
                             } else {
                                 Toast.makeText(adapter.activity, "Something went wrong while signing up.", Toast.LENGTH_SHORT).show();
                                 adapter.registerButton.setEnabled(true);

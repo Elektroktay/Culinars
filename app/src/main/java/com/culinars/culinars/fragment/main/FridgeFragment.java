@@ -15,7 +15,7 @@ import com.culinars.culinars.R;
 import com.culinars.culinars.adapter.main.FridgeAdapter;
 
 /**
- * Created by Oktayşen on 21/6/2016.
+ * A Fragment that holds the fridge page in a PagerAdapter.
  */
 public class FridgeFragment extends Fragment {
     /**
@@ -30,8 +30,7 @@ public class FridgeFragment extends Fragment {
     }
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Creates a new FridgeFragment. Use this instead of the constructor.
      */
     public static FridgeFragment newInstance(Toolbar toolbar) {
         FridgeFragment fragment = new FridgeFragment();
@@ -40,12 +39,15 @@ public class FridgeFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_fridge, container, false);
-        //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
         recyclerView = (RecyclerView) rootView.findViewById(R.id.fridge_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(rootView.getContext(), 3));
@@ -53,19 +55,10 @@ public class FridgeFragment extends Fragment {
         return rootView;
     }
 
-    //Src: https://mzgreen.github.io/2015/02/15/How-to-hideshow-Toolbar-when-list-is-scroling(part1)/
-    private void hideViews() {
-        if (toolbar != null) {
-            toolbar.animate().translationY(-(int) (toolbar.getHeight() * 1.2)).setInterpolator(new AccelerateInterpolator(2)).start();
-        }
-    }
-
-    private void showViews() {
-        if (toolbar != null) {
-            toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        }
-    }
-
+    /**
+     * Executes a search with the given query.
+     * @param searchQuery Query text.
+     */
     public void searchWith(String searchQuery) {
         adapter.updateSearchParams(searchQuery);
     }

@@ -17,7 +17,9 @@ import org.w3c.dom.Text;
 
 import java.util.Random;
 
-
+/**
+ * A fragment that displays facts about the given recipe in a ViewPager.
+ */
 public class RecipeFactsFragment extends Fragment {
     private Recipe currentRecipe;
 
@@ -25,16 +27,28 @@ public class RecipeFactsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new RecipeFactsFragment. Use this instead of the constructor.
+     */
     public static RecipeFactsFragment newInstance(Recipe currentRecipe) {
         RecipeFactsFragment fragment = new RecipeFactsFragment();
         fragment.setCurrentRecipe(currentRecipe);
         return fragment;
     }
 
+    /**
+     * Changes the currently held recipe with a new one.
+     * @param currentRecipe The new recipe to replace the old one.
+     */
     public void setCurrentRecipe(Recipe currentRecipe) {
         this.currentRecipe = currentRecipe;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,6 +88,7 @@ public class RecipeFactsFragment extends Fragment {
             timeUnit.setText("mins");
         }
 
+        //TODO: Actually implement the following values instead of random shit.
         Random rand = new Random(currentRecipe.calories);
 
         TextView sodiumValue = (TextView) rootView.findViewById(R.id.card_sodium_value);

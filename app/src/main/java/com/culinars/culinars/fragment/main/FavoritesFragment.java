@@ -18,13 +18,9 @@ import com.culinars.culinars.adapter.main.FavoritesAdapter;
 import com.culinars.culinars.adapter.main.FavoritesAdapter2;
 
 /**
- * Created by Oktayşen on 21/6/2016.
+ * A Fragment that holds the favorites page in a PagerAdapter.
  */
 public class FavoritesFragment extends Fragment {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
     private Toolbar toolbar;
     public RecyclerView recyclerView;
     private MainActivity activity;
@@ -33,8 +29,7 @@ public class FavoritesFragment extends Fragment {
     }
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Creates a new FavoritesFragment. Use this instead of the constructor.
      */
     public static FavoritesFragment newInstance(Toolbar toolbar, MainActivity activity) {
         FavoritesFragment fragment = new FavoritesFragment();
@@ -43,6 +38,11 @@ public class FavoritesFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * This method is called before xml is loaded onto the screen (inflating).
+     * Inflation must be done here.
+     * @return The view that was created as a result.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,6 +56,10 @@ public class FavoritesFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Changes the adapter of the recyclerView with the new one, and makes the back button return to the original adapter.
+     * @param adapter New adapter to replace the old one.
+     */
     public void setAdapter(RecyclerView.Adapter adapter) {
         recyclerView.setAdapter(adapter);
         if (activity != null) {
