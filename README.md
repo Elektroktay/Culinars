@@ -12,6 +12,9 @@ By using the market platform users can monetize their extra ingredients or compe
 
 Despite traditional recipe apps, Culinars is more focused on the social side of cooking. Users can subscribe and create channels to upload, view, rate, share, comment on recipes. Based on the popularity and number of recipes submitted, Culinars rewards its users with coupons, discounts, invitations, and cash. To nourish inspiration and creativity, Culinars allow its users to share and view ingredients they have, recipe playlists, and what they are cooking at that moment,  while promoting to cook together through the invitation system. 
 
+##Technology
+The app uses mostly native libraries to achieve its look and feel. For the backend, Google's Firebase is used to store the data a fast & responsive realtime database, and have a secure authencation system to protect the users' data. 
+
 ##Installation & Usage
 In Android Studio, click on VCS -> Checkout from Version Control -> GitHub, then paste the repository link to import Culinars into Android Studio.
 
