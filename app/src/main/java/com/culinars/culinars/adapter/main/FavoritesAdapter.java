@@ -42,7 +42,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
             @Override
             public void onDataChange(DataSnapshot s1) {
                 User res = User.from(s1);
-                if (res != null)
+                if (res != null && res.getFavorites() != null)
                     res.getFavorites().getOnce().onComplete(new FB.CompleteListener() {
                     @Override
                     public void onComplete(List<DataSnapshot> results) {

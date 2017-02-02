@@ -13,6 +13,7 @@ public class CulinarsApp extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FacebookSdk.setApplicationId("276752316023119");
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
     }
